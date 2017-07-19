@@ -57,21 +57,22 @@ import cn.john.hub.util.HttpClient;
 @Component
 public class ProxySpider {
 
-	public volatile LinkedBlockingQueue<Proxy> proxyQueue;
 	private HttpClient httpClient;
 	private final static Logger log = LogManager.getLogger("logger");
 	@Autowired
 	private TechWebSpider twSpider;
+	public volatile LinkedBlockingQueue<Proxy> proxyQueue;
+
 	public ProxySpider() {
 		log.info("Constructing...");
 		proxyQueue = new LinkedBlockingQueue<Proxy>();
 	}
-	
+
 	@PostConstruct
 	public void init() {
 		log.info("Start fetching proxy...");
 		if (proxyQueue.size() == 0) {
-			httpClient = new HttpClient("1.85.121.116", 8118);
+			httpClient = new HttpClient();
 			String html = httpClient.getData(Consts.PROXY_SITE);
 			parseProxyHtml(html);
 		}
@@ -106,9 +107,9 @@ public class ProxySpider {
 				list.add(map);
 			}
 		}
-		
+
 		Iterator<HashMap<Integer, Object>> it = list.iterator();
-		
+
 		while (it.hasNext()) {
 			HashMap<Integer, Object> map = it.next();
 			Proxy proxy = new Proxy();
@@ -124,7 +125,7 @@ public class ProxySpider {
 				log.error(e1.getMessage());
 			}
 		}
-		log.info("Proxy saved!Size is "+proxyQueue.size());
+		log.info("Proxy saved!Size is " + proxyQueue.size());
 	}
 
 }

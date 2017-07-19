@@ -10,6 +10,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -48,11 +49,14 @@ public class HttpClient {
 
 	private void init() {
 		DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
-		httpClient = HttpClients.custom().setRoutePlanner(routePlanner).build();
+		RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(5000).setConnectTimeout(5000)
+				.setConnectionRequestTimeout(5000).setStaleConnectionCheckEnabled(true).build();
+		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultRequestConfig).setRoutePlanner(routePlanner)
+				.build();
 	}
 
 	public String getData(String url) {
-		
+
 		ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
 			public String handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
 				int status = response.getStatusLine().getStatusCode();
@@ -64,7 +68,7 @@ public class HttpClient {
 				}
 			}
 		};
-		
+
 		String ua = cn.john.hub.util.Consts.USER_AGENT;
 		HttpGet httpResq = new HttpGet(url);
 		httpResq.setHeader("User-Agent", ua);

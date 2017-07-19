@@ -53,25 +53,24 @@ import cn.john.hub.util.SiteEnum;
  */
 @Component
 public class TechWebSpider extends NewsSpider implements Runnable {
-	
-	
-	public TechWebSpider(){
+
+	public TechWebSpider() {
 		super();
 	}
-	
+
 	@Autowired
-	public void a(NewsService nService){
+	public void a(NewsService nService) {
 		super.nService = nService;
 	}
+
 	@Autowired
-	public void b(ProxySpider pSpider){
+	public void b(ProxySpider pSpider) {
 		super.pSpider = pSpider;
 	}
+
 	@Autowired
-	public void c(SiteService sService){
-		super.sService = sService;
-	}
-	
+	private SiteService siteService;
+
 	/*
 	 * (non Javadoc)
 	 * 
@@ -85,16 +84,14 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 	 * 
 	 */
 	@Override
-	public List<NewsDO> crawlNews() {
-		log.info("Getting html for "+SiteEnum.TECH_WEB.siteName);
-		String html = httpClient.getData(SiteEnum.TECH_WEB.siteAddr);
+	public List<NewsDO> parseNews(String html) {
 		log.info("Parsing...");
 		Document doc = Jsoup.parse(html);
 		Elements news = doc.getElementsByClass("con_list");
 		Elements news1 = news.last().getElementsByClass("con_one");
 		Iterator<Element> it = news1.iterator();
 		List<NewsDO> newsList = new ArrayList<NewsDO>();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			Element e = it.next();
 			Element h2 = e.getElementsByTag("h2").last();
 			Element a = h2.getElementsByTag("a").last();
@@ -103,15 +100,15 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 			NewsDO newsDO = new NewsDO();
 			newsDO.setTitle(title);
 			newsDO.setUrl(url);
-			
+
 			Elements txt = e.getElementsByClass("con_txt");
 			String brief = txt.last().getElementsByTag("p").html();
 			newsDO.setBrief(brief);
 			newsDO.setSiteId(1);
-			
+
 			newsList.add(newsDO);
 		}
-		log.info("Parse completed!size is "+newsList.size());
+		log.info("Parse completed!size is " + newsList.size());
 		return newsList;
 	}
 
@@ -128,16 +125,11 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 	 */
 	@Override
 	public void run() {
-		Proxy proxy = null;
-		Proxy proxy1 = null;
-		try {
-			proxy = pSpider.proxyQueue.take();
-			proxy1 = pSpider.proxyQueue.take();
-		} catch (InterruptedException e) {
-			log.error(e.getMessage());
+		String news = getNews(SiteEnum.TECH_WEB);
+		while (news == null) {
+			news = getNews(SiteEnum.TECH_WEB);
 		}
-		httpClient = new HttpClient(proxy1.getIpAddr(), Integer.parseInt(proxy1.getPort()));
-		nService.saveNews(crawlNews());
+		nService.saveNews(parseNews(news));
 	}
 
 	/*
@@ -154,7 +146,37 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 	@Override
 	protected void init() {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: getNews
+	 * 
+	 * @Description: TODO
+	 * 
+	 * @param site
+	 * 
+	 * @return
+	 * 
+	 * @see cn.john.hub.spider.NewsSpider#getNews(cn.john.hub.util.SiteEnum)
+	 * 
+	 */
+	@Override
+	public String getNews(SiteEnum site) {
+		// TODO Auto-generated method stub
+		Proxy proxy = null;
+		try {
+			proxy = pSpider.proxyQueue.take();
+			log.info("proxy queue size is" + pSpider.proxyQueue.size());
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
+		httpClient = new HttpClient(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
+		log.info("Getting html for " + site.siteName);
+		String html = httpClient.getData(site.siteAddr);
+		return html;
 	}
 
 }

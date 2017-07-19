@@ -32,6 +32,7 @@ import cn.john.hub.domain.SiteDO;
 import cn.john.hub.service.NewsService;
 import cn.john.hub.service.SiteService;
 import cn.john.hub.util.HttpClient;
+import cn.john.hub.util.SiteEnum;
 
 /**
  * 
@@ -46,24 +47,30 @@ import cn.john.hub.util.HttpClient;
  * 
  */
 public abstract class NewsSpider {
+	
 	protected Logger log = LogManager.getLogger("logger");
+	//用于存储数据
 	protected NewsService nService;
+	//用于获取代理
 	protected ProxySpider pSpider;
-	protected SiteService sService;
+	//用于获取需要扫描的
+	protected List<SiteDO> siteList;
 
 	protected HttpClient httpClient;
 
 	public NewsSpider() {
 		init();
 	}
-
+	
+	
 	protected abstract void init();
 
-	public abstract List<NewsDO> crawlNews();
+	public abstract String getNews(SiteEnum site);
+	public abstract List<NewsDO> parseNews(String html);
 
 	public boolean saveNews(List<NewsDO> newsList) {
 		return nService.saveNews(newsList);
-	};
+	}
 
 	public NewsService getnService() {
 		return nService;
@@ -79,14 +86,6 @@ public abstract class NewsSpider {
 
 	public void setpSpider(ProxySpider pSpider) {
 		this.pSpider = pSpider;
-	}
-
-	public SiteService getsService() {
-		return sService;
-	}
-
-	public void setsService(SiteService sService) {
-		this.sService = sService;
 	}
 
 }
