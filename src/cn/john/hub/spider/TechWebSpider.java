@@ -24,6 +24,8 @@ package cn.john.hub.spider;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -84,7 +86,7 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 	 * 
 	 */
 	@Override
-	public List<NewsDO> parseNews(String html) {
+	protected List<NewsDO> parseNews(String html) {
 		log.info("Parsing...");
 		Document doc = Jsoup.parse(html);
 		Elements news = doc.getElementsByClass("con_list");
@@ -125,11 +127,19 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 	 */
 	@Override
 	public void run() {
-		String news = getNews(SiteEnum.TECH_WEB);
-		while (news == null) {
-			news = getNews(SiteEnum.TECH_WEB);
+		while (true) {
+			String news = getNews(SiteEnum.TECH_WEB);
+			while (news == null) {
+				news = getNews(SiteEnum.TECH_WEB);
+				nService.saveNews(parseNews(news));
+			}
+			Random ran = new Random();
+			try {
+				TimeUnit.MINUTES.sleep(ran.nextInt(31)+30);
+			} catch (InterruptedException e) {
+				log.error(e.getMessage());
+			}
 		}
-		nService.saveNews(parseNews(news));
 	}
 
 	/*
@@ -164,7 +174,7 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 	 * 
 	 */
 	@Override
-	public String getNews(SiteEnum site) {
+	protected String getNews(SiteEnum site) {
 		// TODO Auto-generated method stub
 		Proxy proxy = null;
 		try {

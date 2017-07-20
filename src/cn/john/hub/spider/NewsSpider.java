@@ -65,8 +65,8 @@ public abstract class NewsSpider {
 	
 	protected abstract void init();
 
-	public abstract String getNews(SiteEnum site);
-	public abstract List<NewsDO> parseNews(String html);
+	protected abstract String getNews(SiteEnum site);
+	protected abstract List<NewsDO> parseNews(String html);
 
 	public boolean saveNews(List<NewsDO> newsList) {
 		return nService.saveNews(newsList);
