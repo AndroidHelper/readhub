@@ -25,9 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,12 +32,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.util.Consts;
-import cn.john.hub.util.HttpClient;
 
 /**
  * 
@@ -55,34 +50,26 @@ import cn.john.hub.util.HttpClient;
  * 
  */
 @Component
-public class ProxySpider {
+public class XiCiProxySpider extends AbstractProxySpider {
 
-	private HttpClient httpClient;
+	public static final int spiderNumber = 0;
+	
+
 	private final static Logger log = LogManager.getLogger("logger");
-	@Autowired
-	private TechWebSpider twSpider;
-	public volatile LinkedBlockingQueue<Proxy> proxyQueue;
 
-	public ProxySpider() {
-		log.info("Constructing...");
-		proxyQueue = new LinkedBlockingQueue<Proxy>();
-	}
-
-	@PostConstruct
-	public void init() {
-		log.info("Start fetching proxy...");
-		if (proxyQueue.size() == 0) {
-			httpClient = new HttpClient();
-			String html = httpClient.getData(Consts.PROXY_SITE);
-			parseProxyHtml(html);
-		}
-		log.info("Starting thread...");
-		Thread t = new Thread(twSpider);
-		t.start();
-		log.info("Thread started!");
-	}
-
-	private void parseProxyHtml(String html) {
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: parseHtmlAndSaveProxy
+	 * 
+	 * @Description: TODO
+	 * 
+	 * @see cn.john.hub.spider.AbstractProxySpider#parseHtmlAndSaveProxy()
+	 * 
+	 */
+	@Override
+	protected void parseHtmlAndSaveProxy(String html) {
+		// TODO Auto-generated method stub
 		log.info("Start parsing...");
 		Document doc = Jsoup.parse(html);
 		Element news = doc.getElementById("ip_list");
@@ -120,12 +107,38 @@ public class ProxySpider {
 			proxy.setSpeed((String) map.get(7));
 			proxy.setConnectTime((String) map.get(8));
 			try {
-				proxyQueue.put(proxy);
+				Queue.proxyQueue.put(proxy);
 			} catch (InterruptedException e1) {
 				log.error(e1.getMessage());
 			}
 		}
-		log.info("Proxy saved!Size is " + proxyQueue.size());
+		log.info("Proxy saved!Size is " + Queue.proxyQueue.size());
+	}
+
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: run
+	 * 
+	 * @Description: TODO
+	 * 
+	 * 
+	 * @see java.lang.Runnable#run()
+	 * 
+	 */
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		log.info("Start fetching proxy from internet...");
+		ProxyController.fetchingFlag = true;
+		String html = getHtml(Consts.PROXY_SITE);
+		parseHtmlAndSaveProxy(html);
+		ProxyController.fetchingFlag = false;
+	}
+	
+	@Override
+	public String toString() {
+		return "XiCiProxySpider";
 	}
 
 }

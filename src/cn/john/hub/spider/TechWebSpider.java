@@ -54,7 +54,7 @@ import cn.john.hub.util.SiteEnum;
  * 
  */
 @Component
-public class TechWebSpider extends NewsSpider implements Runnable {
+public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 
 	public TechWebSpider() {
 		super();
@@ -66,7 +66,7 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 	}
 
 	@Autowired
-	public void b(ProxySpider pSpider) {
+	public void b(XiCiProxySpider pSpider) {
 		super.pSpider = pSpider;
 	}
 
@@ -159,6 +159,24 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 
 	}
 
+	/* (non Javadoc)
+	
+	 * @Title: getNews
+	
+	 * @Description: TODO
+	
+	 * @param site
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractNewsSpider#getNews(cn.john.hub.util.SiteEnum)
+	
+	 */
+	@Override
+	protected String getNews(SiteEnum site) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/*
 	 * (non Javadoc)
 	 * 
@@ -173,7 +191,7 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 	 * @see cn.john.hub.spider.NewsSpider#getNews(cn.john.hub.util.SiteEnum)
 	 * 
 	 */
-	@Override
+	/*@Override
 	protected String getNews(SiteEnum site) {
 		// TODO Auto-generated method stub
 		Proxy proxy = null;
@@ -187,6 +205,6 @@ public class TechWebSpider extends NewsSpider implements Runnable {
 		log.info("Getting html for " + site.siteName);
 		String html = httpClient.getData(site.siteAddr);
 		return html;
-	}
+	}*/
 
 }

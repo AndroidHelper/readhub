@@ -46,19 +46,19 @@ import cn.john.hub.util.SiteEnum;
  * 
  * 
  */
-public abstract class NewsSpider {
+public abstract class AbstractNewsSpider {
 	
 	protected Logger log = LogManager.getLogger("logger");
 	//用于存储数据
 	protected NewsService nService;
 	//用于获取代理
-	protected ProxySpider pSpider;
+	protected XiCiProxySpider pSpider;
 	//用于获取需要扫描的
 	protected List<SiteDO> siteList;
 
 	protected HttpClient httpClient;
 
-	public NewsSpider() {
+	public AbstractNewsSpider() {
 		init();
 	}
 	
@@ -80,11 +80,11 @@ public abstract class NewsSpider {
 		this.nService = nService;
 	}
 
-	public ProxySpider getpSpider() {
+	public XiCiProxySpider getpSpider() {
 		return pSpider;
 	}
 
-	public void setpSpider(ProxySpider pSpider) {
+	public void setpSpider(XiCiProxySpider pSpider) {
 		this.pSpider = pSpider;
 	}
 
