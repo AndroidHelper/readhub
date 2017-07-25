@@ -46,6 +46,6 @@ public class Queue {
 	
 	@PostConstruct
 	private void init() {
-		System.out.println();
+		System.out.println("test");
 	}
 }
