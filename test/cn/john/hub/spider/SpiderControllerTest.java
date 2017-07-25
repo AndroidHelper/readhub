@@ -37,6 +37,6 @@ import cn.john.hub.main.main1;
  */
 public class SpiderControllerTest {
 	public static void main(String[] args) {
-		new SpiderController();
+		new SpiderDispatcher();
 	}
 }

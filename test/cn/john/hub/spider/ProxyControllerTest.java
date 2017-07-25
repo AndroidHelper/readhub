@@ -37,6 +37,6 @@ import cn.john.hub.main.main1;
  */
 public class ProxyControllerTest {
 	public static void main(String[] args) {
-		new ProxyController();
+		new ProxyDispatcher();
 	}
 }

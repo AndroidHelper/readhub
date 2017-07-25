@@ -46,15 +46,9 @@ import cn.john.hub.util.SiteEnum;
  * 
  * 
  */
-public abstract class AbstractNewsSpider {
+public abstract class AbstractNewsSpider implements Runnable{
 	
 	protected Logger log = LogManager.getLogger("logger");
-	//用于存储数据
-	protected NewsService nService;
-	//用于获取代理
-	protected XiCiProxySpider pSpider;
-	//用于获取需要扫描的
-	protected List<SiteDO> siteList;
 
 	protected HttpClient httpClient;
 
@@ -62,30 +56,10 @@ public abstract class AbstractNewsSpider {
 		init();
 	}
 	
-	
 	protected abstract void init();
 
 	protected abstract String getNews(SiteEnum site);
+	
 	protected abstract List<NewsDO> parseNews(String html);
-
-	public boolean saveNews(List<NewsDO> newsList) {
-		return nService.saveNews(newsList);
-	}
-
-	public NewsService getnService() {
-		return nService;
-	}
-
-	public void setnService(NewsService nService) {
-		this.nService = nService;
-	}
-
-	public XiCiProxySpider getpSpider() {
-		return pSpider;
-	}
-
-	public void setpSpider(XiCiProxySpider pSpider) {
-		this.pSpider = pSpider;
-	}
 
 }

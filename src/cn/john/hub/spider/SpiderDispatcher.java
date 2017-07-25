@@ -43,13 +43,13 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class SpiderController {
+public class SpiderDispatcher {
 	private static Logger log = LogManager.getLogger("logger");
 	public static ExecutorService cacheThreadPool = Executors.newCachedThreadPool();
 
 	@PostConstruct
 	private void startDeamon() {
 		log.info("Spider controller is constructed,starting proxy controller...");
-		cacheThreadPool.execute(new ProxyController());
+		cacheThreadPool.execute(new ProxyDispatcher());
 	}
 }

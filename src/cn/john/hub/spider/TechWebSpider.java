@@ -53,25 +53,11 @@ import cn.john.hub.util.SiteEnum;
  * 
  * 
  */
-@Component
 public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 
 	public TechWebSpider() {
 		super();
 	}
-
-	@Autowired
-	public void a(NewsService nService) {
-		super.nService = nService;
-	}
-
-	@Autowired
-	public void b(XiCiProxySpider pSpider) {
-		super.pSpider = pSpider;
-	}
-
-	@Autowired
-	private SiteService siteService;
 
 	/*
 	 * (non Javadoc)
@@ -127,84 +113,58 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 	 */
 	@Override
 	public void run() {
-		while (true) {
-			String news = getNews(SiteEnum.TECH_WEB);
-			while (news == null) {
-				news = getNews(SiteEnum.TECH_WEB);
-				nService.saveNews(parseNews(news));
-			}
-			Random ran = new Random();
-			try {
-				TimeUnit.MINUTES.sleep(ran.nextInt(31)+30);
-			} catch (InterruptedException e) {
-				log.error(e.getMessage());
-			}
+		String news = getNews(SiteEnum.TECH_WEB);
+		while (news == null) {
+			news = getNews(SiteEnum.TECH_WEB);
 		}
+		parseNews(news);
 	}
+
 
 	/*
 	 * (non Javadoc)
 	 * 
-	 * @Title: init
+	 * @Title: getNews
 	 * 
 	 * @Description: TODO
 	 * 
+	 * @param site
 	 * 
-	 * @see cn.john.hub.spider.NewsSpider#init()
+	 * @return
+	 * 
+	 * @see
+	 * cn.john.hub.spider.AbstractNewsSpider#getNews(cn.john.hub.util.SiteEnum)
 	 * 
 	 */
 	@Override
-	protected void init() {
-		// TODO Auto-generated method stub
+	protected String getNews(SiteEnum site) {
+		Proxy proxy = null;
+		try {
+			proxy = Queue.proxyQueue.take();
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
+		httpClient = new HttpClient(proxy.getIpAddr(),Integer.parseInt(proxy.getPort()));
+		return httpClient.getData(site.siteAddr);
+	}
 
+	@Override
+	public String toString() {
+		return "TechWebSpider";
 	}
 
 	/* (non Javadoc)
 	
-	 * @Title: getNews
+	 * @Title: init
 	
 	 * @Description: TODO
 	
-	 * @param site
-	 * @return
 	
-	 * @see cn.john.hub.spider.AbstractNewsSpider#getNews(cn.john.hub.util.SiteEnum)
+	 * @see cn.john.hub.spider.AbstractNewsSpider#init()
 	
 	 */
 	@Override
-	protected String getNews(SiteEnum site) {
-		// TODO Auto-generated method stub
-		return null;
+	protected void init() {
+		
 	}
-
-	/*
-	 * (non Javadoc)
-	 * 
-	 * @Title: getNews
-	 * 
-	 * @Description: TODO
-	 * 
-	 * @param site
-	 * 
-	 * @return
-	 * 
-	 * @see cn.john.hub.spider.NewsSpider#getNews(cn.john.hub.util.SiteEnum)
-	 * 
-	 */
-	/*@Override
-	protected String getNews(SiteEnum site) {
-		// TODO Auto-generated method stub
-		Proxy proxy = null;
-		try {
-			proxy = pSpider.proxyQueue.take();
-			log.info("proxy queue size is" + pSpider.proxyQueue.size());
-		} catch (InterruptedException e) {
-			log.error(e.getMessage());
-		}
-		httpClient = new HttpClient(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
-		log.info("Getting html for " + site.siteName);
-		String html = httpClient.getData(site.siteAddr);
-		return html;
-	}*/
-
 }

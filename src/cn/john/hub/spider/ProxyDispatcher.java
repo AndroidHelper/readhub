@@ -23,6 +23,7 @@ package cn.john.hub.spider;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -41,15 +42,15 @@ import org.apache.logging.log4j.Logger;
  * 
  * 
  */
-public class ProxyController implements Runnable {
+public class ProxyDispatcher implements Runnable {
 
 	private static Logger log = LogManager.getLogger("logger");
 	private HashMap<Integer, AbstractProxySpider> proxyMap;
 	public static volatile boolean fetchingFlag;
-	
-	public ProxyController() {
+
+	public ProxyDispatcher() {
 		fetchingFlag = false;
-		proxyMap = new HashMap<Integer,AbstractProxySpider>();
+		proxyMap = new HashMap<Integer, AbstractProxySpider>();
 		init();
 	}
 
@@ -81,14 +82,21 @@ public class ProxyController implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		while (true) {
-			if (isLackOfProxy() && !fetchingFlag) {
+			if (!fetchingFlag && isLackOfProxy()) {
 				startProxySpider();
+				try {
+					//给出时间让线程启动修改fetchingFlag
+					TimeUnit.SECONDS.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
 
 	private boolean isLackOfProxy() {
-		if (Queue.proxyQueue.size() < 20&&!fetchingFlag) {
+		if (Queue.proxyQueue.size() < 20) {
 			log.warn("lack of proxy!");
 			return true;
 		}
@@ -101,7 +109,7 @@ public class ProxyController implements Runnable {
 		int randKey = keys[rand.nextInt(keys.length)];
 		AbstractProxySpider proxySpider = proxyMap.get(randKey);
 		log.info("Proxy spider get!Detail: " + proxySpider);
-		SpiderController.cacheThreadPool.execute(proxySpider);
+		SpiderDispatcher.cacheThreadPool.execute(proxySpider);
 	}
 
 }
