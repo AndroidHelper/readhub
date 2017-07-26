@@ -69,7 +69,6 @@ public class XiCiProxySpider extends AbstractProxySpider {
 	 */
 	@Override
 	protected void parseHtmlAndSaveProxy(String html) {
-		// TODO Auto-generated method stub
 		log.info("Start parsing...");
 		Document doc = Jsoup.parse(html);
 		Element news = doc.getElementById("ip_list");
@@ -112,7 +111,7 @@ public class XiCiProxySpider extends AbstractProxySpider {
 				log.error(e1.getMessage());
 			}
 		}
-		log.info("Proxy saved!Size is " + Queue.proxyQueue.size());
+		log.info("Proxy saved!Proxy size is " + Queue.proxyQueue.size());
 	}
 
 	/*

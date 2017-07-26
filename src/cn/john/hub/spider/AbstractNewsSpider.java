@@ -49,14 +49,15 @@ import cn.john.hub.util.SiteEnum;
 public abstract class AbstractNewsSpider implements Runnable{
 	
 	protected Logger log = LogManager.getLogger("logger");
-
+	protected int delayFactor;
 	protected HttpClient httpClient;
 
 	public AbstractNewsSpider() {
 		init();
 	}
 	
-	protected abstract void init();
+	protected void init() {
+	}
 
 	protected abstract String getNews(SiteEnum site);
 	

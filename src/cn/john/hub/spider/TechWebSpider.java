@@ -54,11 +54,11 @@ import cn.john.hub.util.SiteEnum;
  * 
  */
 public class TechWebSpider extends AbstractNewsSpider implements Runnable {
-
-	public TechWebSpider() {
-		super();
-	}
-
+	
+	public static final int serialNumber = 0;
+	
+	public int delayFactor = 30;
+	
 	/*
 	 * (non Javadoc)
 	 * 
@@ -151,20 +151,5 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 	@Override
 	public String toString() {
 		return "TechWebSpider";
-	}
-
-	/* (non Javadoc)
-	
-	 * @Title: init
-	
-	 * @Description: TODO
-	
-	
-	 * @see cn.john.hub.spider.AbstractNewsSpider#init()
-	
-	 */
-	@Override
-	protected void init() {
-		
 	}
 }
