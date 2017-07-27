@@ -129,10 +129,10 @@ public class XiCiProxySpider extends AbstractProxySpider {
 	public void run() {
 		// TODO Auto-generated method stub
 		log.info("Start fetching proxy from internet...");
-		ProxyDispatcher.fetchingFlag = true;
+		ProxySpiderDispatcher.fetchingFlag = true;
 		String html = getHtml(Consts.PROXY_SITE);
 		parseHtmlAndSaveProxy(html);
-		ProxyDispatcher.fetchingFlag = false;
+		ProxySpiderDispatcher.fetchingFlag = false;
 	}
 	
 	@Override

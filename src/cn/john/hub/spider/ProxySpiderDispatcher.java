@@ -42,13 +42,13 @@ import org.apache.logging.log4j.Logger;
  * 
  * 
  */
-public class ProxyDispatcher implements Runnable {
+public class ProxySpiderDispatcher implements Runnable {
 
 	private static Logger log = LogManager.getLogger("logger");
 	private HashMap<Integer, AbstractProxySpider> proxyMap;
 	public static volatile boolean fetchingFlag;
 
-	public ProxyDispatcher() {
+	public ProxySpiderDispatcher() {
 		fetchingFlag = false;
 		proxyMap = new HashMap<Integer, AbstractProxySpider>();
 		init();

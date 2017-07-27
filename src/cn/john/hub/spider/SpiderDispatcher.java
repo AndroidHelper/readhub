@@ -49,7 +49,8 @@ public class SpiderDispatcher {
 
 	@PostConstruct
 	private void startDeamon() {
-		log.info("Spider controller is constructed,starting proxy controller...");
-		cacheThreadPool.execute(new ProxyDispatcher());
+		log.info("Spider controller is constructed,starting proxy spider and news spider dispatchers...");
+		cacheThreadPool.execute(new ProxySpiderDispatcher());
+		cacheThreadPool.execute(new NewsSpiderDispatcher());
 	}
 }

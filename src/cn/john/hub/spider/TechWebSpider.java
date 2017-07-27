@@ -45,7 +45,7 @@ import cn.john.hub.util.SiteEnum;
  * 
  * @ClassName: TechWebSpider
  * 
- * @Description: TODO
+ * @Description: 从ProxyQueue中拿到proxy,然后发起http请求获取html，解析
  * 
  * @author: John
  * 
@@ -55,9 +55,9 @@ import cn.john.hub.util.SiteEnum;
  */
 public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 	
-	public static final int serialNumber = 0;
+	private static final int serialNumber = 0;
 	
-	public int delayFactor = 30;
+	private static final int delayFactor = 0;
 	
 	/*
 	 * (non Javadoc)
@@ -73,7 +73,7 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 	 */
 	@Override
 	protected List<NewsDO> parseNews(String html) {
-		log.info("Parsing...");
+		log.info("Parsing techweb news...");
 		Document doc = Jsoup.parse(html);
 		Elements news = doc.getElementsByClass("con_list");
 		Elements news1 = news.last().getElementsByClass("con_one");
@@ -141,6 +141,7 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 		Proxy proxy = null;
 		try {
 			proxy = Queue.proxyQueue.take();
+			log.info("Proxy size is "+Queue.proxyQueue.size());
 		} catch (InterruptedException e) {
 			log.error(e.getMessage());
 		}
@@ -151,5 +152,39 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 	@Override
 	public String toString() {
 		return "TechWebSpider";
+	}
+
+	/* (non Javadoc)
+	
+	 * @Title: getFactor
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractNewsSpider#getFactor()
+	
+	 */
+	@Override
+	public int getDelayFactor() {
+		// TODO Auto-generated method stub
+		return delayFactor;
+	}
+
+	/* (non Javadoc)
+	
+	 * @Title: getSerialNumber
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractNewsSpider#getSerialNumber()
+	
+	 */
+	@Override
+	public int getSerialNumber() {
+		// TODO Auto-generated method stub
+		return serialNumber;
 	}
 }
