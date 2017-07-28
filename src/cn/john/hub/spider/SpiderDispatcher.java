@@ -28,6 +28,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,11 +47,16 @@ import org.springframework.stereotype.Component;
 public class SpiderDispatcher {
 	private static Logger log = LogManager.getLogger("logger");
 	public static ExecutorService cacheThreadPool = Executors.newCachedThreadPool();
-
+	@Autowired
+	private NewsSaver ns;
 	@PostConstruct
 	private void startDeamon() {
-		log.info("Spider controller is constructed,starting proxy spider and news spider dispatchers...");
+		//负责维护代理ip
 		cacheThreadPool.execute(new ProxySpiderDispatcher());
+		//负责爬取新闻信息
 		cacheThreadPool.execute(new NewsSpiderDispatcher());
+		//负责存储数据
+		cacheThreadPool.execute(ns);
+		log.info("Spider controller is constructed!proxy spider,news spider and news saver are started!");
 	}
 }

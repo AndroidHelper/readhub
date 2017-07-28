@@ -39,7 +39,7 @@ import cn.john.hub.util.HttpClient;
 public class main1 {
 	public static void main(String arg[]){
 		HttpClient hc = new HttpClient();
-		String s = hc.getData(Consts.PROXY_SITE);
+		String s = hc.getData(Consts.PROXY_XICI);
 		System.out.println(s);
 	}
 }

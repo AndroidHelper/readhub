@@ -25,16 +25,17 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import cn.john.hub.spider.proxy.DoubleSixProxySpider;
+import cn.john.hub.spider.proxy.XiCiProxySpider;
 
 /**
  * 
  * @ClassName: ProxyController
  * 
- * @Description: TODO
+ * @Description: 代理爬虫调度器
  * 
  * @author: John
  * 
@@ -53,17 +54,16 @@ public class ProxySpiderDispatcher implements Runnable {
 		proxyMap = new HashMap<Integer, AbstractProxySpider>();
 		init();
 	}
-
+	//注册已有的代理爬虫以供选择
 	private void init() {
 		try {
 			proxyMap.put(XiCiProxySpider.spiderNumber, XiCiProxySpider.class.newInstance());
+			proxyMap.put(DoubleSixProxySpider.spiderNumber, DoubleSixProxySpider.class.newInstance());
 			log.info("proxy map initialized!Detail: " + proxyMap);
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage());
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 	}
 
@@ -88,8 +88,7 @@ public class ProxySpiderDispatcher implements Runnable {
 					//给出时间让线程启动修改fetchingFlag
 					TimeUnit.SECONDS.sleep(10);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.error(e.getMessage());
 				}
 			}
 		}
@@ -102,13 +101,15 @@ public class ProxySpiderDispatcher implements Runnable {
 		}
 		return false;
 	}
-
+	//启动代理爬虫
 	private void startProxySpider() {
+		//随机选择代理爬虫
 		Integer[] keys = proxyMap.keySet().toArray(new Integer[0]);
 		Random rand = new Random();
 		int randKey = keys[rand.nextInt(keys.length)];
 		AbstractProxySpider proxySpider = proxyMap.get(randKey);
 		log.info("Proxy spider get!Detail: " + proxySpider);
+		//启动
 		SpiderDispatcher.cacheThreadPool.execute(proxySpider);
 	}
 

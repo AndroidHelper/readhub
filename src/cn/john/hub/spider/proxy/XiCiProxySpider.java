@@ -19,22 +19,20 @@
  * @version: V1.0  
 
  */
-package cn.john.hub.spider;
+package cn.john.hub.spider.proxy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.stereotype.Component;
 
 import cn.john.hub.domain.Proxy;
+import cn.john.hub.spider.AbstractProxySpider;
 import cn.john.hub.util.Consts;
 
 /**
@@ -49,13 +47,9 @@ import cn.john.hub.util.Consts;
  * 
  * 
  */
-@Component
-public class XiCiProxySpider extends AbstractProxySpider {
+public class XiCiProxySpider extends AbstractProxySpider{
 
 	public static final int spiderNumber = 0;
-	
-
-	private final static Logger log = LogManager.getLogger("logger");
 
 	/*
 	 * (non Javadoc)
@@ -68,8 +62,8 @@ public class XiCiProxySpider extends AbstractProxySpider {
 	 * 
 	 */
 	@Override
-	protected void parseHtmlAndSaveProxy(String html) {
-		log.info("Start parsing...");
+	protected void parseHtml(String html) {
+		log.info("Start parsing proxy html...");
 		Document doc = Jsoup.parse(html);
 		Element news = doc.getElementById("ip_list");
 		Elements trs = news.getElementsByTag("tr");
@@ -101,43 +95,29 @@ public class XiCiProxySpider extends AbstractProxySpider {
 			Proxy proxy = new Proxy();
 			proxy.setIpAddr((String) map.get(2));
 			proxy.setPort((String) map.get(3));
-			proxy.setAnonymity((String) map.get(5));
-			proxy.setType((String) map.get(6));
-			proxy.setSpeed((String) map.get(7));
-			proxy.setConnectTime((String) map.get(8));
-			try {
-				Queue.proxyQueue.put(proxy);
-			} catch (InterruptedException e1) {
-				log.error(e1.getMessage());
-			}
+			proxyList.add(proxy);
 		}
-		log.info("Proxy saved!Proxy size is " + Queue.proxyQueue.size());
 	}
 
-	/*
-	 * (non Javadoc)
-	 * 
-	 * @Title: run
-	 * 
-	 * @Description: TODO
-	 * 
-	 * 
-	 * @see java.lang.Runnable#run()
-	 * 
-	 */
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		log.info("Start fetching proxy from internet...");
-		ProxySpiderDispatcher.fetchingFlag = true;
-		String html = getHtml(Consts.PROXY_SITE);
-		parseHtmlAndSaveProxy(html);
-		ProxySpiderDispatcher.fetchingFlag = false;
-	}
-	
 	@Override
 	public String toString() {
 		return "XiCiProxySpider";
+	}
+
+	/* (non Javadoc)
+	
+	 * @Title: getProxySite
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySite()
+	
+	 */
+	@Override
+	protected String getProxySite() {
+		return Consts.PROXY_XICI;
 	}
 
 }

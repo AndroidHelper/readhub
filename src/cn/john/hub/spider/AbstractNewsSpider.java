@@ -25,12 +25,9 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.john.hub.domain.NewsDO;
-import cn.john.hub.domain.SiteDO;
-import cn.john.hub.service.NewsService;
-import cn.john.hub.service.SiteService;
+import cn.john.hub.domain.Proxy;
 import cn.john.hub.util.HttpClient;
 import cn.john.hub.util.SiteEnum;
 
@@ -65,6 +62,8 @@ public abstract class AbstractNewsSpider implements Runnable {
 
 	protected abstract String getNews(SiteEnum site);
 
-	protected abstract List<NewsDO> parseNews(String html);
+	protected abstract void parseNews(String html);
+	
+	protected abstract void offerProxyToQueue(Proxy proxy);
 
 }

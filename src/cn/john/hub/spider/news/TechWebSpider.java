@@ -19,25 +19,21 @@
  * @version: V1.0  
 
  */
-package cn.john.hub.spider;
+package cn.john.hub.spider.news;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import cn.john.hub.domain.NewsDO;
 import cn.john.hub.domain.Proxy;
-import cn.john.hub.service.NewsService;
-import cn.john.hub.service.SiteService;
+import cn.john.hub.spider.AbstractNewsSpider;
+import cn.john.hub.spider.Queue;
 import cn.john.hub.util.HttpClient;
 import cn.john.hub.util.SiteEnum;
 
@@ -54,11 +50,11 @@ import cn.john.hub.util.SiteEnum;
  * 
  */
 public class TechWebSpider extends AbstractNewsSpider implements Runnable {
-	
+
 	private static final int serialNumber = 0;
-	
+
 	private static final int delayFactor = 0;
-	
+
 	/*
 	 * (non Javadoc)
 	 * 
@@ -72,7 +68,7 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 	 * 
 	 */
 	@Override
-	protected List<NewsDO> parseNews(String html) {
+	protected void parseNews(String html) {
 		log.info("Parsing techweb news...");
 		Document doc = Jsoup.parse(html);
 		Elements news = doc.getElementsByClass("con_list");
@@ -97,7 +93,7 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 			newsList.add(newsDO);
 		}
 		log.info("Parse completed!size is " + newsList.size());
-		return newsList;
+		Queue.newsQueue.add(newsList);
 	}
 
 	/*
@@ -113,13 +109,8 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 	 */
 	@Override
 	public void run() {
-		String news = getNews(SiteEnum.TECH_WEB);
-		while (news == null) {
-			news = getNews(SiteEnum.TECH_WEB);
-		}
-		parseNews(news);
+		parseNews(getNews(SiteEnum.TECH_WEB));
 	}
-
 
 	/*
 	 * (non Javadoc)
@@ -138,15 +129,20 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 	 */
 	@Override
 	protected String getNews(SiteEnum site) {
+		String html = null;
 		Proxy proxy = null;
-		try {
-			proxy = Queue.proxyQueue.take();
-			log.info("Proxy size is "+Queue.proxyQueue.size());
-		} catch (InterruptedException e) {
-			log.error(e.getMessage());
+		while (html == null) {
+			try {
+				proxy = Queue.proxyQueue.take();
+				log.info("Proxy size is " + Queue.proxyQueue.size());
+			} catch (InterruptedException e) {
+				log.error(e.getMessage());
+			}
+			httpClient = new HttpClient(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
+			html = httpClient.getData(site.siteAddr);
 		}
-		httpClient = new HttpClient(proxy.getIpAddr(),Integer.parseInt(proxy.getPort()));
-		return httpClient.getData(site.siteAddr);
+		offerProxyToQueue(proxy);
+		return html;
 	}
 
 	@Override
@@ -154,16 +150,17 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 		return "TechWebSpider";
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: getFactor
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractNewsSpider#getFactor()
-	
+	 * 
 	 */
 	@Override
 	public int getDelayFactor() {
@@ -171,20 +168,42 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 		return delayFactor;
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: getSerialNumber
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractNewsSpider#getSerialNumber()
-	
+	 * 
 	 */
 	@Override
 	public int getSerialNumber() {
 		// TODO Auto-generated method stub
 		return serialNumber;
+	}
+
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: offerProxyToQueue
+	 * 
+	 * @Description: TODO
+	 * 
+	 * 
+	 * @see cn.john.hub.spider.AbstractNewsSpider#offerProxyToQueue()
+	 * 
+	 */
+	@Override
+	protected void offerProxyToQueue(Proxy proxy) {
+		try {
+			Queue.proxyQueue.put(proxy);
+			log.info("Offer proxy "+proxy+" to queue! Size is "+Queue.proxyQueue.size());
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
 	}
 }

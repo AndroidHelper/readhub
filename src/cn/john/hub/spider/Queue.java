@@ -21,10 +21,12 @@
  */
 package cn.john.hub.spider;
 
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.PostConstruct;
 
+import cn.john.hub.domain.NewsDO;
 import cn.john.hub.domain.Proxy;
 
 /**
@@ -42,10 +44,6 @@ import cn.john.hub.domain.Proxy;
 public class Queue {
 	
 	public static LinkedBlockingQueue<Proxy> proxyQueue = new LinkedBlockingQueue<Proxy>();
-	public static LinkedBlockingQueue<Object> newsQueue = new LinkedBlockingQueue<Object>();
+	public static LinkedBlockingQueue<List<NewsDO>> newsQueue = new LinkedBlockingQueue<List<NewsDO>>();
 	
-	@PostConstruct
-	private void init() {
-		System.out.println("test");
-	}
 }
