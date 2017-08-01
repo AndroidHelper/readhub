@@ -21,9 +21,7 @@
  */
 package cn.john.hub.spider.news;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,10 +29,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.NewsDO;
-import cn.john.hub.domain.Proxy;
 import cn.john.hub.spider.AbstractNewsSpider;
-import cn.john.hub.spider.Queue;
-import cn.john.hub.util.HttpClient;
 import cn.john.hub.util.SiteEnum;
 
 /**
@@ -49,11 +44,13 @@ import cn.john.hub.util.SiteEnum;
  * 
  * 
  */
-public class TechWebSpider extends AbstractNewsSpider implements Runnable {
+public class TechWebSpider extends AbstractNewsSpider{
 
 	private static final int serialNumber = 0;
 
 	private static final int delayFactor = 0;
+
+	private static final String site = SiteEnum.TECH_WEB.siteAddr;
 
 	/*
 	 * (non Javadoc)
@@ -68,13 +65,12 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 	 * 
 	 */
 	@Override
-	protected void parseNews(String html) {
+	protected void parseHtml(String html) {
 		log.info("Parsing techweb news...");
 		Document doc = Jsoup.parse(html);
 		Elements news = doc.getElementsByClass("con_list");
 		Elements news1 = news.last().getElementsByClass("con_one");
 		Iterator<Element> it = news1.iterator();
-		List<NewsDO> newsList = new ArrayList<NewsDO>();
 		while (it.hasNext()) {
 			Element e = it.next();
 			Element h2 = e.getElementsByTag("h2").last();
@@ -84,65 +80,14 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 			NewsDO newsDO = new NewsDO();
 			newsDO.setTitle(title);
 			newsDO.setUrl(url);
-
 			Elements txt = e.getElementsByClass("con_txt");
 			String brief = txt.last().getElementsByTag("p").html();
 			newsDO.setBrief(brief);
 			newsDO.setSiteId(1);
 
-			newsList.add(newsDO);
+			dataList.add(newsDO);
 		}
-		log.info("Parse completed!size is " + newsList.size());
-		Queue.newsQueue.add(newsList);
-	}
-
-	/*
-	 * (non Javadoc)
-	 * 
-	 * @Title: run
-	 * 
-	 * @Description: TODO
-	 * 
-	 * 
-	 * @see java.lang.Runnable#run()
-	 * 
-	 */
-	@Override
-	public void run() {
-		parseNews(getNews(SiteEnum.TECH_WEB));
-	}
-
-	/*
-	 * (non Javadoc)
-	 * 
-	 * @Title: getNews
-	 * 
-	 * @Description: TODO
-	 * 
-	 * @param site
-	 * 
-	 * @return
-	 * 
-	 * @see
-	 * cn.john.hub.spider.AbstractNewsSpider#getNews(cn.john.hub.util.SiteEnum)
-	 * 
-	 */
-	@Override
-	protected String getNews(SiteEnum site) {
-		String html = null;
-		Proxy proxy = null;
-		while (html == null) {
-			try {
-				proxy = Queue.proxyQueue.take();
-				log.info("Proxy size is " + Queue.proxyQueue.size());
-			} catch (InterruptedException e) {
-				log.error(e.getMessage());
-			}
-			httpClient = new HttpClient(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
-			html = httpClient.getData(site.siteAddr);
-		}
-		offerProxyToQueue(proxy);
-		return html;
+		log.info("Parse completed!size is " + dataList.size());
 	}
 
 	@Override
@@ -186,24 +131,21 @@ public class TechWebSpider extends AbstractNewsSpider implements Runnable {
 		return serialNumber;
 	}
 
-	/*
-	 * (non Javadoc)
-	 * 
-	 * @Title: offerProxyToQueue
-	 * 
+	/* (non Javadoc)
+	
+	 * @Title: site
+	
 	 * @Description: TODO
-	 * 
-	 * 
-	 * @see cn.john.hub.spider.AbstractNewsSpider#offerProxyToQueue()
-	 * 
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractSpider#site()
+	
 	 */
 	@Override
-	protected void offerProxyToQueue(Proxy proxy) {
-		try {
-			Queue.proxyQueue.put(proxy);
-			log.info("Offer proxy "+proxy+" to queue! Size is "+Queue.proxyQueue.size());
-		} catch (InterruptedException e) {
-			log.error(e.getMessage());
-		}
+	protected String site() {
+		// TODO Auto-generated method stub
+		return site;
 	}
+
 }

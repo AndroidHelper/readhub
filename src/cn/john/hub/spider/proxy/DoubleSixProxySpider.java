@@ -70,7 +70,7 @@ public class DoubleSixProxySpider extends AbstractProxySpider{
 			Elements tdList = tr.getElementsByTag("td");
 			proxy.setIpAddr(tdList.get(0).text());
 			proxy.setPort(tdList.get(1).text());
-			proxyList.add(proxy);
+			dataList.add(proxy);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class DoubleSixProxySpider extends AbstractProxySpider{
 	
 	 */
 	@Override
-	protected String getProxySite() {
+	protected String site() {
 		String site = "http://www.66ip.cn/areaindex_"+(rand.nextInt(34)+1)+"/1.html";
 		return site;
 	}
@@ -95,6 +95,4 @@ public class DoubleSixProxySpider extends AbstractProxySpider{
 	public String toString() {
 		return "DoubleSixProxySpider";
 	}
-	
-
 }

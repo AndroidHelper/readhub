@@ -48,10 +48,10 @@ import cn.john.hub.spider.news.TechWebSpider;
  * 
  */
 public class NewsSpiderDispatcher implements Runnable {
-	private static Logger log = LogManager.getLogger("logger");
+	private final Logger log = LogManager.getLogger("logger");
 	private Random rand;
 	private HashMap<Integer, AbstractNewsSpider> newsSpiderMap;
-	private static LinkedList<AbstractNewsSpider> newsSpiderQueue;
+	private LinkedList<AbstractNewsSpider> newsSpiderQueue;
 
 	public Map<Integer, DateTime> timerMap;
 

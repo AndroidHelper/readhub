@@ -21,8 +21,7 @@
  */
 package cn.john.hub.spider;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
+import cn.john.hub.domain.Proxy;
 import cn.john.hub.util.HttpClient;
 import cn.john.hub.util.SiteEnum;
 
@@ -40,7 +39,10 @@ import cn.john.hub.util.SiteEnum;
  */
 public class HttpClientTest {
 	public static void main(String[] args) {
-		HttpClient httpClient = new HttpClient("111.13.2.138",80);
+		Proxy proxy = new Proxy();
+		proxy.setIpAddr("");
+		proxy.setPort("");
+		HttpClient httpClient = new HttpClient(proxy);
 		String s = httpClient.getData(SiteEnum.TECH_WEB.siteAddr);
 		System.out.println(s);
 	}

@@ -22,14 +22,11 @@
 package cn.john.hub.spider;
 
 import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import cn.john.hub.domain.NewsDO;
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.util.HttpClient;
-import cn.john.hub.util.SiteEnum;
 
 /**
  * 
@@ -43,27 +40,46 @@ import cn.john.hub.util.SiteEnum;
  * 
  * 
  */
-public abstract class AbstractNewsSpider implements Runnable {
+public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 
-	protected Logger log = LogManager.getLogger("logger");
-
-	protected HttpClient httpClient;
-
-	public AbstractNewsSpider() {
-		init();
-	}
-
-	protected void init() {
-	}
-
-	protected abstract int getDelayFactor();
-
-	protected abstract int getSerialNumber();
-
-	protected abstract String getNews(SiteEnum site);
-
-	protected abstract void parseNews(String html);
+	private static LinkedBlockingQueue<List<NewsDO>> newsQueue;
 	
-	protected abstract void offerProxyToQueue(Proxy proxy);
+	public AbstractNewsSpider() {
+		newsQueue = Queue.newsQueue;
+	}
+	
+	
+	@Override
+	public void run(){
+		super.run();
+	}
+	
+	
+	protected void putDataToQueue(List<NewsDO> newsList){
+		try {
+			newsQueue.put(dataList);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void initHttpClient() {
+		Proxy proxy = null;
+		try {
+			proxy = proxyQueue.take();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if (httpClient == null) {
+			httpClient = new HttpClient(proxy);
+		} else {
+			httpClient.setProxy(proxy);
+		}
+	}
+	
+	//用于调度
+	protected abstract int getDelayFactor();
+	
+	protected abstract int getSerialNumber();
 
 }

@@ -20,6 +20,8 @@ import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import cn.john.hub.domain.Proxy;
+
 /**
  * 
  * @ClassName: HttpClient
@@ -35,24 +37,29 @@ import org.apache.logging.log4j.Logger;
 public class HttpClient {
 
 	private final static Logger log = LogManager.getLogger("logger");
-	private HttpHost proxy;
+	private HttpHost proxyHost;
+	private Proxy proxy;
 	private CloseableHttpClient httpClient;
+	private RequestConfig defaultReqCfg = RequestConfig.custom().setSocketTimeout(5000).setConnectTimeout(5000)
+			.setConnectionRequestTimeout(5000).setStaleConnectionCheckEnabled(true).build();
 
 	public HttpClient() {
-		httpClient = HttpClients.createDefault();
+		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).build();
 	}
 
-	public HttpClient(String ipAddr, int port) {
-		proxy = new HttpHost(ipAddr, port);
-		init();
+	public HttpClient(Proxy proxy) {
+		setProxy(proxy);
 	}
 
-	private void init() {
-		DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
-		RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(5000).setConnectTimeout(5000)
-				.setConnectionRequestTimeout(5000).setStaleConnectionCheckEnabled(true).build();
-		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultRequestConfig).setRoutePlanner(routePlanner)
-				.build();
+	public void setProxy(Proxy proxy) {
+		this.proxy = proxy;
+		proxyHost = new HttpHost(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
+		DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
+		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).setRoutePlanner(routePlanner).build();
+	}
+
+	public Proxy getProxy() {
+		return proxy == null ? null : proxy;
 	}
 
 	public String getData(String url) {

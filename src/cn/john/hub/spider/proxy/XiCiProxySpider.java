@@ -95,7 +95,7 @@ public class XiCiProxySpider extends AbstractProxySpider{
 			Proxy proxy = new Proxy();
 			proxy.setIpAddr((String) map.get(2));
 			proxy.setPort((String) map.get(3));
-			proxyList.add(proxy);
+			dataList.add(proxy);
 		}
 	}
 
@@ -106,17 +106,18 @@ public class XiCiProxySpider extends AbstractProxySpider{
 
 	/* (non Javadoc)
 	
-	 * @Title: getProxySite
+	 * @Title: site
 	
 	 * @Description: TODO
 	
 	 * @return
 	
-	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySite()
+	 * @see cn.john.hub.spider.AbstractSpider#site()
 	
 	 */
 	@Override
-	protected String getProxySite() {
+	protected String site() {
+		// TODO Auto-generated method stub
 		return Consts.PROXY_XICI;
 	}
 
