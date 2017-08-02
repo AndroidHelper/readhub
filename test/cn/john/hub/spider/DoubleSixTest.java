@@ -37,7 +37,5 @@ import cn.john.hub.spider.proxy.DoubleSixProxySpider;
  */
 public class DoubleSixTest {
 	public static void main(String[] args) {
-		DoubleSixProxySpider s = new DoubleSixProxySpider();
-		s.run();
 	}
 }
