@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -99,6 +100,12 @@ public class NewsSpiderDispatcher implements Runnable {
 	public void run() {
 		log.info("News Spider dispatcher start!");
 		while (true) {
+			try {
+				TimeUnit.SECONDS.sleep(2);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			offerSpiderToQueue();
 			if (newsSpiderQueue.size() > 0) {
 				AbstractNewsSpider newsSpider = newsSpiderQueue.poll();

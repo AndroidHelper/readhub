@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.util.HttpClient;
@@ -45,6 +46,8 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 	
 	protected Random rand;
 
+	protected AtomicBoolean crawlingFlag;
+	
 	protected AbstractProxySpider() {
 		rand = new Random();
 	}
@@ -52,9 +55,10 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 	@Override
 	public void run() {
 		log.info("Start fetching proxy from "+site());
-		ProxySpiderDispatcher.fetchingFlag = true;
-		super.run();
-		ProxySpiderDispatcher.fetchingFlag = false;
+		synchronized(crawlingFlag){
+			super.run();
+			crawlingFlag.notify();
+		}
 	}
 	
 	protected void initHttpClient() {

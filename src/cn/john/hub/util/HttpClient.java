@@ -95,7 +95,6 @@ public class HttpClient {
 			log.error(e);
 			return null;
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error(e);
 			return null;
 		} finally {

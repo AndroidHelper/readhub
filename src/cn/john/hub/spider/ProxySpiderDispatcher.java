@@ -24,6 +24,7 @@ package cn.john.hub.spider;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,24 +48,24 @@ public class ProxySpiderDispatcher implements Runnable {
 
 	private static Logger log = LogManager.getLogger("logger");
 	private HashMap<Integer, AbstractProxySpider> proxyMap;
-	public static volatile boolean fetchingFlag;
+
+	private AtomicBoolean crawlingFlag;
 
 	public ProxySpiderDispatcher() {
-		fetchingFlag = false;
+		crawlingFlag = new AtomicBoolean(false);
 		proxyMap = new HashMap<Integer, AbstractProxySpider>();
 		init();
 	}
-	//注册已有的代理爬虫以供选择
+
+	// 注册已有的代理爬虫以供选择
 	private void init() {
-		try {
-			proxyMap.put(XiCiProxySpider.spiderNumber, XiCiProxySpider.class.newInstance());
-			proxyMap.put(DoubleSixProxySpider.spiderNumber, DoubleSixProxySpider.class.newInstance());
-			log.info("proxy map initialized!Detail: " + proxyMap);
-		} catch (InstantiationException e) {
-			log.error(e.getMessage());
-		} catch (IllegalAccessException e) {
-			log.error(e.getMessage());
-		}
+
+		XiCiProxySpider xcps = new XiCiProxySpider(crawlingFlag);
+		DoubleSixProxySpider dsps = new DoubleSixProxySpider(crawlingFlag);
+
+		proxyMap.put(XiCiProxySpider.spiderNumber, xcps);
+		proxyMap.put(DoubleSixProxySpider.spiderNumber, dsps);
+		log.info("proxy map initialized!Detail: " + proxyMap);
 	}
 
 	/*
@@ -81,14 +82,18 @@ public class ProxySpiderDispatcher implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		log.info("Proxy dispatcher is started!");
 		while (true) {
-			if (!fetchingFlag && isLackOfProxy()) {
-				startProxySpider();
+			// 最大化同步块，以节约CPU
+			synchronized (crawlingFlag) {
 				try {
-					//给出时间让线程启动修改fetchingFlag
-					TimeUnit.SECONDS.sleep(10);
+					TimeUnit.SECONDS.sleep(2);
 				} catch (InterruptedException e) {
-					log.error(e.getMessage());
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (isLackOfProxy()) {
+					startProxySpider();
 				}
 			}
 		}
@@ -101,16 +106,24 @@ public class ProxySpiderDispatcher implements Runnable {
 		}
 		return false;
 	}
-	//启动代理爬虫
+
+	// 启动代理爬虫
 	private void startProxySpider() {
-		//随机选择代理爬虫
+		// 随机选择代理爬虫
 		Integer[] keys = proxyMap.keySet().toArray(new Integer[0]);
 		Random rand = new Random();
 		int randKey = keys[rand.nextInt(keys.length)];
 		AbstractProxySpider proxySpider = proxyMap.get(randKey);
 		log.info("Proxy spider get!Detail: " + proxySpider);
-		//启动
+		// 启动
 		SpiderDispatcher.cacheThreadPool.execute(proxySpider);
+		try {
+			log.info("A proxy spider has been launched! Waiting for it to finish crawling...");
+			crawlingFlag.wait();
+			log.info("proxy spider has done it's work!");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

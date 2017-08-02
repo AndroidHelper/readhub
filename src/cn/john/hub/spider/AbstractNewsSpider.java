@@ -54,10 +54,10 @@ public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 		super.run();
 	}
 	
-	
 	protected void putDataToQueue(List<NewsDO> newsList){
 		try {
 			newsQueue.put(dataList);
+			dataList.clear();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

@@ -62,6 +62,7 @@ public abstract class AbstractSpider<T> implements Runnable {
 		String s = null;
 		while(s == null){
 			initHttpClient();
+			log.info("httpClient initialized!Proxy queue size is "+proxyQueue.size());
 			s = httpClient.getData(site);
 		}
 		

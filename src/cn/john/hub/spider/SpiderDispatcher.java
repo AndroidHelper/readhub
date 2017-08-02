@@ -57,6 +57,7 @@ public class SpiderDispatcher {
 		cacheThreadPool.execute(new NewsSpiderDispatcher());
 		//负责存储数据
 		cacheThreadPool.execute(ns);
+		
 		log.info("Spider controller is constructed!proxy spider,news spider and news saver are started!");
 	}
 }

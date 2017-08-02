@@ -22,6 +22,7 @@
 package cn.john.hub.spider.proxy;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,30 +33,36 @@ import cn.john.hub.domain.Proxy;
 import cn.john.hub.spider.AbstractProxySpider;
 
 /**
-
+ * 
  * @ClassName: DoubleSixProxySpider
-
+ * 
  * @Description: TODO
-
+ * 
  * @author: John
-
+ * 
  * @date: 2017年7月28日 下午3:42:42
-
-
+ * 
+ * 
  */
-public class DoubleSixProxySpider extends AbstractProxySpider{
-	
+public class DoubleSixProxySpider extends AbstractProxySpider {
+
 	public static final int spiderNumber = 1;
-	/* (non Javadoc)
-	
+
+	public DoubleSixProxySpider(AtomicBoolean crawlingFlag) {
+		this.crawlingFlag = crawlingFlag;
+	}
+
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: parseHtml
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @param html
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractProxySpider#parseHtml(java.lang.String)
-	
+	 * 
 	 */
 	@Override
 	protected void parseHtml(String html) {
@@ -64,7 +71,7 @@ public class DoubleSixProxySpider extends AbstractProxySpider{
 		Elements trList = table.getElementsByTag("tr");
 		trList.remove(0);
 		Iterator<Element> it = trList.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			Proxy proxy = new Proxy();
 			Element tr = it.next();
 			Elements tdList = tr.getElementsByTag("td");
@@ -74,20 +81,21 @@ public class DoubleSixProxySpider extends AbstractProxySpider{
 		}
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: getProxySite
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySite()
-	
+	 * 
 	 */
 	@Override
 	protected String site() {
-		String site = "http://www.66ip.cn/areaindex_"+(rand.nextInt(34)+1)+"/1.html";
+		String site = "http://www.66ip.cn/areaindex_" + (rand.nextInt(34) + 1) + "/1.html";
 		return site;
 	}
 

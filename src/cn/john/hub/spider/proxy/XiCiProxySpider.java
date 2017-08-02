@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -50,7 +51,11 @@ import cn.john.hub.util.Consts;
 public class XiCiProxySpider extends AbstractProxySpider{
 
 	public static final int spiderNumber = 0;
-
+		
+	public XiCiProxySpider(AtomicBoolean crawlingFlag){
+		super.crawlingFlag = crawlingFlag;
+	}
+	
 	/*
 	 * (non Javadoc)
 	 * 

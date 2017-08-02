@@ -22,6 +22,7 @@
 package cn.john.hub.spider;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,6 +64,12 @@ public class NewsSaver implements Runnable{
 	public void run() {
 		log.info("News saver started!");
 		while(true){
+			try {
+				TimeUnit.SECONDS.sleep(5);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if(Queue.newsQueue.size()>0){
 				List<NewsDO> newsList = null;
 				try {
