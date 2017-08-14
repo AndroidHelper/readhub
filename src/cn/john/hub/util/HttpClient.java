@@ -16,6 +16,7 @@ import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,12 +43,15 @@ public class HttpClient {
 	private CloseableHttpClient httpClient;
 	private RequestConfig defaultReqCfg = RequestConfig.custom().setSocketTimeout(5000).setConnectTimeout(5000)
 			.setConnectionRequestTimeout(5000).setStaleConnectionCheckEnabled(true).build();
+	private PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
 
 	public HttpClient() {
-		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).build();
+		cm.setMaxTotal(100);
+		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).setConnectionManager(cm).build();
 	}
 
 	public HttpClient(Proxy proxy) {
+		cm.setMaxTotal(100);
 		setProxy(proxy);
 	}
 
@@ -55,7 +59,8 @@ public class HttpClient {
 		this.proxy = proxy;
 		proxyHost = new HttpHost(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
 		DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
-		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).setRoutePlanner(routePlanner).build();
+		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).setRoutePlanner(routePlanner)
+				.setConnectionManager(cm).build();
 	}
 
 	public Proxy getProxy() {

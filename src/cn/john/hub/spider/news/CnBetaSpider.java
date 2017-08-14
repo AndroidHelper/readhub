@@ -47,7 +47,7 @@ public class CnBetaSpider extends AbstractNewsSpider{
 	
 	private static final int serialNumber = 1;
 
-	private static final int delayFactor = 0;
+	private static final int delayFactor = 1;
 
 	private static final String site = "http://www.cnbeta.com/category/tech.htm";
 	

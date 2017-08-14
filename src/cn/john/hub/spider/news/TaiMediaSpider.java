@@ -45,9 +45,9 @@ import cn.john.hub.spider.AbstractNewsSpider;
  */
 public class TaiMediaSpider extends AbstractNewsSpider{
 	
-	private static final int serialNumber = 1;
+	private static final int serialNumber = 2;
 
-	private static final int delayFactor = 0;
+	private static final int delayFactor = 1;
 
 	private static final String site = "http://www.tmtpost.com/column/2581216";
 	

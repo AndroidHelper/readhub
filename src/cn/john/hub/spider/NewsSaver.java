@@ -78,6 +78,7 @@ public class NewsSaver implements Runnable{
 					log.error(e.getMessage());
 				}
 				nService.saveNews(newsList);
+				log.info(newsList);
 				log.info("newsList saved!And newsQueue size is "+Queue.newsQueue.size());
 			}
 		}

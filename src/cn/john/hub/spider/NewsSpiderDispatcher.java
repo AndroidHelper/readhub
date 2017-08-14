@@ -34,6 +34,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
+import cn.john.hub.spider.news.CnBetaSpider;
+import cn.john.hub.spider.news.TaiMediaSpider;
 import cn.john.hub.spider.news.TechWebSpider;
 
 /**
@@ -68,8 +70,11 @@ public class NewsSpiderDispatcher implements Runnable {
 		// 通过关联spider的序列号，注册newsspider类的实例
 		try {
 			AbstractNewsSpider newsSpider = TechWebSpider.class.newInstance();
-			
+			AbstractNewsSpider newsSpider1 = CnBetaSpider.class.newInstance();
+			AbstractNewsSpider newsSpider2 = TaiMediaSpider.class.newInstance();
 			newsSpiderMap.put(newsSpider.getSerialNumber(),newsSpider);
+			newsSpiderMap.put(newsSpider1.getSerialNumber(),newsSpider1);
+			newsSpiderMap.put(newsSpider2.getSerialNumber(),newsSpider2);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
@@ -106,7 +111,9 @@ public class NewsSpiderDispatcher implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			offerSpiderToQueue();
+			if(Queue.proxyQueue.size()>0){
+				offerSpiderToQueue();
+			}
 			if (newsSpiderQueue.size() > 0) {
 				AbstractNewsSpider newsSpider = newsSpiderQueue.poll();
 				int delayTime = newsSpider.getDelayFactor() + rand.nextInt(2);
