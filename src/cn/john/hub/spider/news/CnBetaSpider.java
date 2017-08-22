@@ -134,6 +134,7 @@ public class CnBetaSpider extends AbstractNewsSpider{
 			news.setUrl(aTag.attr("href"));
 			Element brief = e.getElementsByTag("dd").get(0);
 			news.setBrief(brief.text());
+			news.setSiteId(1);
 			
 			dataList.add(news);
 		}

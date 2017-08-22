@@ -49,7 +49,7 @@ public class SpiderDispatcher {
 	public static ExecutorService cacheThreadPool = Executors.newCachedThreadPool();
 	@Autowired
 	private NewsSaver ns;
-	@PostConstruct
+	//@PostConstruct
 	private void startDeamon() {
 		//负责维护代理ip
 		cacheThreadPool.execute(new ProxySpiderDispatcher());

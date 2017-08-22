@@ -10,4 +10,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             (#{news.title},#{news.brief},#{news.url},#{news.siteId})
         </foreach>
     </insert>
+    
+    <select id="listNews" resultType="cn.john.hub.domain.NewsVO">
+        SELECT title,brief,url,siteName,siteAddr
+        FROM news JOIN site ON news.siteId = site.siteId
+        ORDER BY  RAND()
+        LIMIT 10
+    </select>
+    
 </mapper>

@@ -137,6 +137,7 @@ public class TaiMediaSpider extends AbstractNewsSpider{
 			news.setBrief(brief);
 			news.setUrl(url);
 			news.setTitle(title);
+			news.setSiteId(1);
 			dataList.add(news);
 		}
 		

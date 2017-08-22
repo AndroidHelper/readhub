@@ -21,8 +21,6 @@
  */
 package cn.john.hub.spider;
 
-import cn.john.hub.main.main1;
-
 /**
 
  * @ClassName: ProxyControllerTest

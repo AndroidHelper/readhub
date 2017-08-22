@@ -43,26 +43,24 @@ import cn.john.hub.util.HttpClient;
 public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 
 	private static LinkedBlockingQueue<List<NewsDO>> newsQueue;
-	
+
 	public AbstractNewsSpider() {
 		newsQueue = Queue.newsQueue;
 	}
-	
-	
+
 	@Override
-	public void run(){
+	public void run() {
 		super.run();
 	}
-	
-	protected void putDataToQueue(List<NewsDO> newsList){
+
+	protected void putDataToQueue(List<NewsDO> newsList) {
 		try {
 			newsQueue.put(dataList);
-			dataList.clear();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void initHttpClient() {
 		Proxy proxy = null;
 		try {
@@ -70,16 +68,14 @@ public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		if (httpClient == null) {
-			httpClient = new HttpClient(proxy);
-		} else {
-			httpClient.setProxy(proxy);
-		}
+
+		httpClient = new HttpClient(proxy);
+
 	}
-	
-	//用于调度
+
+	// 用于调度
 	protected abstract int getDelayFactor();
-	
+
 	protected abstract int getSerialNumber();
 
 }

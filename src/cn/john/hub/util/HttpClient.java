@@ -42,25 +42,18 @@ public class HttpClient {
 	private Proxy proxy;
 	private CloseableHttpClient httpClient;
 	private RequestConfig defaultReqCfg = RequestConfig.custom().setSocketTimeout(5000).setConnectTimeout(5000)
-			.setConnectionRequestTimeout(5000).setStaleConnectionCheckEnabled(true).build();
-	private PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+			.setConnectionRequestTimeout(5000).build();
 
 	public HttpClient() {
-		cm.setMaxTotal(100);
-		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).setConnectionManager(cm).build();
+		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).build();
 	}
 
 	public HttpClient(Proxy proxy) {
-		cm.setMaxTotal(100);
-		setProxy(proxy);
-	}
-
-	public void setProxy(Proxy proxy) {
 		this.proxy = proxy;
 		proxyHost = new HttpHost(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
 		DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
 		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).setRoutePlanner(routePlanner)
-				.setConnectionManager(cm).build();
+				.build();
 	}
 
 	public Proxy getProxy() {

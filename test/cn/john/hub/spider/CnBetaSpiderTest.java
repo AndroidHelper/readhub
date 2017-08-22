@@ -29,8 +29,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.NewsDO;
-import cn.john.hub.main.main1;
-import cn.john.hub.spider.news.CnBetaSpider;
 import cn.john.hub.util.HttpClient;
 
 /**

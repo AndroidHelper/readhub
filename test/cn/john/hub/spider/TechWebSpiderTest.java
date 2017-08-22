@@ -9,7 +9,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.NewsDO;
-import cn.john.hub.main.main1;
 import cn.john.hub.util.HttpClient;
 import cn.john.hub.util.SiteEnum;
 
@@ -70,7 +69,6 @@ public class TechWebSpiderTest {
 			String brief = txt.last().getElementsByTag("p").html();
 			newsDO.setBrief(brief);
 			newsDO.setSiteId(1);
-
 			newsList.add(newsDO);
 		}
 		System.out.println(newsList);
