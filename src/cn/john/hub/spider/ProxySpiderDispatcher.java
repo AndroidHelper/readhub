@@ -81,15 +81,13 @@ public class ProxySpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		log.info("Proxy dispatcher is started!");
+		log.info("Proxy dispatcher is started! 10 seconds a loop!");
 		while (true) {
 			// 最大化同步块，以节约CPU
 			synchronized (crawlingFlag) {
 				try {
-					TimeUnit.SECONDS.sleep(2);
+					TimeUnit.SECONDS.sleep(5);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				if (isLackOfProxy()) {

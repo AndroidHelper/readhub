@@ -65,8 +65,10 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 		Proxy proxy = null;
 		proxy = proxyQueue.poll();
 		if (proxy != null) {
+			log.info("Fetching proxys using proxy ip...");
 			httpClient = new HttpClient(proxy);
 		} else {
+			log.info("Fetching proxys using local ip address...");
 			httpClient = new HttpClient();
 			// 直接使用本机ip，如果本机ip访问出错，避免本机ip迅速访问被封
 			try {
@@ -77,8 +79,8 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 		}
 	}
 
-	protected void putDataToQueue(List<Proxy> proxyList) {
-		Iterator<Proxy> it = proxyList.iterator();
+	protected void putDataToQueue() {
+		Iterator<Proxy> it = dataList.iterator();
 		while (it.hasNext()) {
 			try {
 				proxyQueue.put(it.next());
@@ -86,7 +88,8 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 				log.error(e.getMessage());
 			}
 		}
-		log.info("Put "+proxyList.size()+" proxys into proxy queue!And now proxy queue size is "+proxyQueue.size());
+		dataList.clear();
+		log.info("Put "+dataList.size()+" proxys into proxy queue!And now proxy queue size is "+proxyQueue.size());
 	}
 
 }

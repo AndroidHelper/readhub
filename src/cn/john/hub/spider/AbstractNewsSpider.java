@@ -21,6 +21,7 @@
  */
 package cn.john.hub.spider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -53,9 +54,11 @@ public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 		super.run();
 	}
 
-	protected void putDataToQueue(List<NewsDO> newsList) {
+	protected void putDataToQueue() {
 		try {
-			newsQueue.put(dataList);
+			List<NewsDO> newsList = new ArrayList<NewsDO>(dataList);
+			newsQueue.put(newsList);
+			dataList.clear();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

@@ -62,12 +62,11 @@ public class NewsSaver implements Runnable{
 	 */
 	@Override
 	public void run() {
-		log.info("News saver started!");
+		log.info("News saver started!30 seconds a loop!");
 		while(true){
 			try {
-				TimeUnit.SECONDS.sleep(5);
+				TimeUnit.SECONDS.sleep(30);;
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			if(Queue.newsQueue.size()>0){
@@ -78,7 +77,7 @@ public class NewsSaver implements Runnable{
 					log.error(e.getMessage());
 				}
 				nService.saveNews(newsList);
-				log.info("newsList saved!And newsQueue size is "+Queue.newsQueue.size());
+				log.info(newsList.size()+" news saved!And newsQueue size is "+Queue.newsQueue.size());
 			}
 		}
 	}

@@ -34,7 +34,7 @@ import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.spider.AbstractProxySpider;
-import cn.john.hub.util.Consts;
+import cn.john.hub.util.HubConsts;
 
 /**
  * 
@@ -123,7 +123,7 @@ public class XiCiProxySpider extends AbstractProxySpider{
 	@Override
 	protected String site() {
 		// TODO Auto-generated method stub
-		return Consts.PROXY_XICI;
+		return HubConsts.PROXY_XICI;
 	}
 
 }

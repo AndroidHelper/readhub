@@ -5,7 +5,7 @@
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] -%F(%L) -%m%n" />
 		</Console>
 		<RollingFile name="logger" fileName="D:\\logs\\readhub.log"
-			filePattern="D:\\logs\\$${date:yyyy-MM}\\app-%d{MM-dd-yyyy}-%i.log.gz">
+			filePattern="D:\\logs\\$${date:yyyy-MM}\\app-%d{MM-dd-yyyy}-%i.log">
 			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] - %c -%F(%L) -%m%n"></PatternLayout>
 			<SizeBasedTriggeringPolicy size="10MB" />

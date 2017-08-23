@@ -81,11 +81,11 @@ public abstract class AbstractSpider<T> implements Runnable {
 
 	protected abstract void parseHtml(String html);
 
-	protected abstract void putDataToQueue(List<T> list);
+	protected abstract void putDataToQueue();
 
 	@Override
 	public void run() {
 		parseHtml(getHtml(site()));
-		putDataToQueue(dataList);
+		putDataToQueue();
 	}
 }

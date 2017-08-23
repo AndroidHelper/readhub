@@ -103,10 +103,10 @@ public class NewsSpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		log.info("News Spider dispatcher start!");
+		log.info("News Spider dispatcher start!30 secends a loop!");
 		while (true) {
 			try {
-				TimeUnit.SECONDS.sleep(2);
+				TimeUnit.SECONDS.sleep(5);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -116,7 +116,7 @@ public class NewsSpiderDispatcher implements Runnable {
 			}
 			if (newsSpiderQueue.size() > 0) {
 				AbstractNewsSpider newsSpider = newsSpiderQueue.poll();
-				int delayTime = newsSpider.getDelayFactor() + rand.nextInt(2);
+				int delayTime = newsSpider.getDelayFactor() + rand.nextInt(5);
 				int sn = newsSpider.getSerialNumber();
 				DateTime nextExeTime = timerMap.get(sn).plusMinutes(delayTime);
 				timerMap.put(sn, nextExeTime);

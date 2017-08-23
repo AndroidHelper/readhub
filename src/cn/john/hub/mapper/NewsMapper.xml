@@ -4,18 +4,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.john.hub.dao.NewsMapper">
     <insert id="saveNews" parameterType="cn.john.hub.domain.NewsDO">
-        INSERT IGNORE INTO news(title,brief,url,siteId)
+        INSERT IGNORE INTO news(title,brief,url,siteId,create_time)
         VALUES
         <foreach collection="list" item="news" separator=",">
-            (#{news.title},#{news.brief},#{news.url},#{news.siteId})
+            (#{news.title},#{news.brief},#{news.url},#{news.siteId},now())
         </foreach>
     </insert>
     
     <select id="listNews" resultType="cn.john.hub.domain.NewsVO">
         SELECT title,brief,url,siteName,siteAddr
         FROM news JOIN site ON news.siteId = site.siteId
-        ORDER BY  RAND()
-        LIMIT 10
+        ORDER BY create_time DESC
+        LIMIT 20
     </select>
-    
 </mapper>

@@ -33,7 +33,13 @@ package cn.john.hub.util;
  * 
  * 
  */
-public class Consts {
+public class HubConsts {
 	public static final String PROXY_XICI = "http://www.xicidaili.com/nn/";
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+	public static final String ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
+	public static final String ACCEPT_ENCODING = "gzip, deflate, br";
+	public static final String ACCEPT_LANGUAGE = "zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4";
+	public static final String CACHE_CONTROL = "no-cache";
+	public static final String DNT = "1";
+	public static final String ACCEPT_CHARSET = "utf-8";
 }

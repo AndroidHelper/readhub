@@ -74,9 +74,14 @@ public class HttpClient {
 			}
 		};
 
-		String ua = cn.john.hub.util.Consts.USER_AGENT;
 		HttpGet httpResq = new HttpGet(url);
-		httpResq.setHeader("User-Agent", ua);
+		httpResq.setHeader("User-Agent", HubConsts.USER_AGENT);
+		httpResq.setHeader("Accept", HubConsts.ACCEPT);
+		httpResq.setHeader("Accept-Encoding", HubConsts.ACCEPT_ENCODING);
+		httpResq.setHeader("Accept-Language", HubConsts.ACCEPT_LANGUAGE);
+		httpResq.setHeader("Cache-Control", HubConsts.CACHE_CONTROL);
+		httpResq.setHeader("DNT", HubConsts.DNT);
+		httpResq.setHeader("Accept-Charset", HubConsts.ACCEPT_CHARSET);
 
 		try {
 			return httpClient.execute(httpResq, responseHandler);
