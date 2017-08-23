@@ -116,7 +116,7 @@ public class NewsSpiderDispatcher implements Runnable {
 			}
 			if (newsSpiderQueue.size() > 0) {
 				AbstractNewsSpider newsSpider = newsSpiderQueue.poll();
-				int delayTime = newsSpider.getDelayFactor() + rand.nextInt(5);
+				int delayTime = newsSpider.getDelayFactor() + rand.nextInt(30);
 				int sn = newsSpider.getSerialNumber();
 				DateTime nextExeTime = timerMap.get(sn).plusMinutes(delayTime);
 				timerMap.put(sn, nextExeTime);
