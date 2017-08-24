@@ -88,8 +88,8 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 				log.error(e.getMessage());
 			}
 		}
-		dataList.clear();
 		log.info("Put "+dataList.size()+" proxys into proxy queue!And now proxy queue size is "+proxyQueue.size());
+		dataList.clear();
 	}
 
 }

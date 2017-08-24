@@ -48,7 +48,7 @@ public class TechWebSpider extends AbstractNewsSpider{
 
 	private static final int serialNumber = 0;
 
-	private static final int delayFactor = 1;
+	private static final int delayFactor = 20;
 
 	private static final String site = SiteEnum.TECH_WEB.siteAddr;
 

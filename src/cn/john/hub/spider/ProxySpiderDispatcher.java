@@ -108,9 +108,12 @@ public class ProxySpiderDispatcher implements Runnable {
 	// 启动代理爬虫
 	private void startProxySpider() {
 		// 随机选择代理爬虫
-		Integer[] keys = proxyMap.keySet().toArray(new Integer[0]);
 		Random rand = new Random();
-		int randKey = keys[rand.nextInt(keys.length)];
+		int randInt = rand.nextInt(10);
+		int randKey = 0;
+		if(randInt<=7){
+			randKey = 1;
+		}
 		AbstractProxySpider proxySpider = proxyMap.get(randKey);
 		log.info("Proxy spider get!Detail: " + proxySpider);
 		// 启动

@@ -47,7 +47,7 @@ public class TaiMediaSpider extends AbstractNewsSpider{
 	
 	private static final int serialNumber = 2;
 
-	private static final int delayFactor = 1;
+	private static final int delayFactor = 15;
 
 	private static final String site = "http://www.tmtpost.com/column/2581216";
 	

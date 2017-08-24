@@ -53,13 +53,15 @@ import cn.john.hub.spider.news.TechWebSpider;
 public class NewsSpiderDispatcher implements Runnable {
 	private final Logger log = LogManager.getLogger("logger");
 	private Random rand;
-	private HashMap<Integer, AbstractNewsSpider> newsSpiderMap;
+	@SuppressWarnings("rawtypes")
+	private HashMap<Integer, Class> newsSpiderMap;
 	private LinkedList<AbstractNewsSpider> newsSpiderQueue;
 
 	public Map<Integer, DateTime> timerMap;
 
+	@SuppressWarnings("rawtypes")
 	public NewsSpiderDispatcher() {
-		newsSpiderMap = new HashMap<Integer, AbstractNewsSpider>();
+		newsSpiderMap = new HashMap<Integer, Class>();
 		newsSpiderQueue = new LinkedList<AbstractNewsSpider>();
 		rand = new Random();
 		timerMap = Collections.synchronizedMap(new HashMap<Integer, DateTime>());
@@ -68,26 +70,19 @@ public class NewsSpiderDispatcher implements Runnable {
 
 	private void init() {
 		// 通过关联spider的序列号，注册newsspider类的实例
-		try {
-			AbstractNewsSpider newsSpider = TechWebSpider.class.newInstance();
-			AbstractNewsSpider newsSpider1 = CnBetaSpider.class.newInstance();
-			AbstractNewsSpider newsSpider2 = TaiMediaSpider.class.newInstance();
-			newsSpiderMap.put(newsSpider.getSerialNumber(),newsSpider);
-			newsSpiderMap.put(newsSpider1.getSerialNumber(),newsSpider1);
-			newsSpiderMap.put(newsSpider2.getSerialNumber(),newsSpider2);
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		log.info("News spider initialing....NewsSpiderMap: "+newsSpiderMap);
+
+		newsSpiderMap.put(0, TechWebSpider.class);
+		newsSpiderMap.put(1, CnBetaSpider.class);
+		newsSpiderMap.put(2, TaiMediaSpider.class);
+
+		log.info("News spider initialing....NewsSpiderMap: " + newsSpiderMap);
 		// 将类的启动时间与spider序列号关联，初始化启动时间为当前时间
 		Set<Integer> nsSet = newsSpiderMap.keySet();
 		DateTime now = new DateTime();
 		for (Integer i : nsSet) {
 			timerMap.put(i, now);
 		}
-		log.info("News spider initialized!timerMap: "+timerMap);
+		log.info("News spider initialized!timerMap: " + timerMap);
 	}
 
 	/*
@@ -103,7 +98,7 @@ public class NewsSpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		log.info("News Spider dispatcher start!30 secends a loop!");
+		log.info("News Spider dispatcher start!5 secends a loop!");
 		while (true) {
 			try {
 				TimeUnit.SECONDS.sleep(5);
@@ -111,8 +106,16 @@ public class NewsSpiderDispatcher implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if(Queue.proxyQueue.size()>0){
-				offerSpiderToQueue();
+			if (Queue.proxyQueue.size() > 10 && newsSpiderQueue.size() < 6) {
+				try {
+					offerSpiderToQueue();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			if (newsSpiderQueue.size() > 0) {
 				AbstractNewsSpider newsSpider = newsSpiderQueue.poll();
@@ -120,22 +123,25 @@ public class NewsSpiderDispatcher implements Runnable {
 				int sn = newsSpider.getSerialNumber();
 				DateTime nextExeTime = timerMap.get(sn).plusMinutes(delayTime);
 				timerMap.put(sn, nextExeTime);
-				log.info("Executing " + newsSpider+"and it's next execute time is "+timerMap.get(sn));
+				log.info("Executing " + newsSpider + "and it's next execute time is " + timerMap.get(sn));
 				SpiderDispatcher.cacheThreadPool.execute(newsSpider);
 			}
 		}
 	}
-	
-	private void offerSpiderToQueue(){
+
+	private void offerSpiderToQueue() throws InstantiationException, IllegalAccessException {
 		DateTime now = new DateTime();
 		Set<Integer> snSet = timerMap.keySet();
 		Iterator<Integer> it = snSet.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			int sn = it.next();
 			DateTime timeOfSpider = timerMap.get(sn);
-			if(now.isAfter(timeOfSpider)){
-				newsSpiderQueue.offer(newsSpiderMap.get(sn));
-				log.info("Offer spider to queue!"+newsSpiderMap.get(sn)+"And it's execute time is "+timerMap.get(sn));
+			@SuppressWarnings("unchecked")
+			Class<AbstractNewsSpider> newsSpider = newsSpiderMap.get(sn);
+			if (now.isAfter(timeOfSpider)) {
+				newsSpiderQueue.offer(newsSpider.newInstance());
+				log.info("Offer spider to queue!" + newsSpiderMap.get(sn) + "And it's execute time is "
+						+ timerMap.get(sn));
 			}
 		}
 	}
