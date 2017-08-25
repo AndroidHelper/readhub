@@ -1,12 +1,5 @@
 /**  
-
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: NewsServiceImpl.java
-
- * @Prject: Test3
 
  * @Package: cn.john.hub.service.impl
 

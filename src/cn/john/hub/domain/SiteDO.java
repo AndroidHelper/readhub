@@ -1,12 +1,5 @@
 /**  
-
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: SiteDO.java
-
- * @Prject: Test3
 
  * @Package: cn.john.hub.domain
 

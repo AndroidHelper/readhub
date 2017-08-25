@@ -1,12 +1,6 @@
 /**  
 
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: News.java
-
- * @Prject: Test3
 
  * @Package: cn.john.hub.domain
 

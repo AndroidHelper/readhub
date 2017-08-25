@@ -1,12 +1,5 @@
 /**  
-
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: NewsController.java
-
- * @Prject: Test3
 
  * @Package: cn.john.hub.controller
 
@@ -50,7 +43,6 @@ public class NewsController {
 	
 	@RequestMapping("/index")
 	public String index(){
-		System.out.println("....");
 		return "index";
 	}
 	

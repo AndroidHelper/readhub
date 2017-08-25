@@ -1,12 +1,5 @@
 /**  
-
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: ProxyMapper.java
-
- * @Prject: Test3
 
  * @Package: cn.john.hub.spider.dao
 

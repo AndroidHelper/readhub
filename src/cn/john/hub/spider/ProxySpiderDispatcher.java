@@ -1,12 +1,6 @@
 /**  
 
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: ProxyController.java
-
- * @Prject: Test3
 
  * @Package: cn.john.hub.spider
 

@@ -1,9 +1,5 @@
 /**  
 
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: SiteEnum.java
 
  * @Prject: Test3
