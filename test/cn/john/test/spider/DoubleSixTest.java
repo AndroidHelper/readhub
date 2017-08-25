@@ -1,12 +1,6 @@
 /**  
 
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: DoubleSixTest.java
-
- * @Prject: Test3
 
  * @Package: cn.john.hub.spider
 
@@ -19,7 +13,7 @@
  * @version: V1.0  
 
  */
-package cn.john.hub.spider;
+package cn.john.test.spider;
 
 import cn.john.hub.spider.proxy.DoubleSixProxySpider;
 

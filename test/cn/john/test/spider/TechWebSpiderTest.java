@@ -1,4 +1,4 @@
-package cn.john.hub.spider;
+package cn.john.test.spider;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,13 +14,7 @@ import cn.john.hub.util.SiteEnum;
 
 /**  
 
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: TechWebSpiderTest.java
-
- * @Prject: Test3
 
  * @Package: 
 

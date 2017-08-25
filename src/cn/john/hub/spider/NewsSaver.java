@@ -44,6 +44,7 @@ public class NewsSaver implements Runnable {
 	private NewsService nService;
 	@Autowired
 	private Heartbeat hb;
+
 	/*
 	 * (non Javadoc)
 	 * 
@@ -57,7 +58,7 @@ public class NewsSaver implements Runnable {
 	 */
 	@Override
 	public void run() {
-		
+
 		long timestamp = System.currentTimeMillis();
 		hb.setNewsSaverBeat(timestamp);
 		if (Queue.newsQueue.size() > 0) {
@@ -67,8 +68,9 @@ public class NewsSaver implements Runnable {
 			} catch (InterruptedException e) {
 				log.error(e.getMessage());
 			}
-			nService.saveNews(newsList);
-			log.info(newsList.size() + " news saved!And newsQueue size is " + Queue.newsQueue.size());
+			int savedCount = nService.saveNews(newsList);
+			hb.setLastSavedNewsCount(savedCount);
+			log.info(savedCount + " news saved!And newsQueue size is " + Queue.newsQueue.size());
 		}
 	}
 

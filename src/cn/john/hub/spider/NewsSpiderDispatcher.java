@@ -15,13 +15,13 @@
  */
 package cn.john.hub.spider;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cn.john.hub.domain.Heartbeat;
+import cn.john.hub.domain.NewsSpiderWithTime;
 import cn.john.hub.spider.news.CnBetaSpider;
 import cn.john.hub.spider.news.TaiMediaSpider;
 import cn.john.hub.spider.news.TechWebSpider;
@@ -49,38 +50,40 @@ import cn.john.hub.spider.news.TechWebSpider;
 @Component
 public class NewsSpiderDispatcher implements Runnable {
 	private final Logger log = LogManager.getLogger("logger");
+	private ExecutorService cacheThreadPool;
 	private Random rand;
 	@SuppressWarnings("rawtypes")
-	private HashMap<Integer, Class> newsSpiderMap;
-	private LinkedList<AbstractNewsSpider> newsSpiderQueue;
+	private List<NewsSpiderWithTime> spiderList;
+	private LinkedList<AbstractNewsSpider> executeQueue;
 	@Autowired
 	private Heartbeat hb;
-	public Map<Integer, DateTime> timerMap;
-	
+
 	@SuppressWarnings("rawtypes")
 	public NewsSpiderDispatcher() {
-		newsSpiderMap = new HashMap<Integer, Class>();
-		newsSpiderQueue = new LinkedList<AbstractNewsSpider>();
+		cacheThreadPool = Executors.newCachedThreadPool();
+		spiderList = new ArrayList<NewsSpiderWithTime>();
+		executeQueue = new LinkedList<AbstractNewsSpider>();
 		rand = new Random();
-		timerMap = Collections.synchronizedMap(new HashMap<Integer, DateTime>());
 		init();
 	}
 
 	private void init() {
-		// 通过关联spider的序列号，注册newsspider类的实例
-
-		newsSpiderMap.put(0, TechWebSpider.class);
-		newsSpiderMap.put(1, CnBetaSpider.class);
-		newsSpiderMap.put(2, TaiMediaSpider.class);
-
-		log.info("News spider initialing....NewsSpiderMap: " + newsSpiderMap);
-		// 将类的启动时间与spider序列号关联，初始化启动时间为当前时间
-		Set<Integer> nsSet = newsSpiderMap.keySet();
+		//注册newsspider类的实例
+		NewsSpiderWithTime<TechWebSpider> ns1 = new NewsSpiderWithTime<TechWebSpider>();
+		NewsSpiderWithTime<CnBetaSpider> ns2 = new NewsSpiderWithTime<CnBetaSpider>();
+		NewsSpiderWithTime<TaiMediaSpider> ns3 = new NewsSpiderWithTime<TaiMediaSpider>();
+		ns1.setClazz(TechWebSpider.class);
+		ns2.setClazz(CnBetaSpider.class);
+		ns3.setClazz(TaiMediaSpider.class);
 		DateTime now = new DateTime();
-		for (Integer i : nsSet) {
-			timerMap.put(i, now);
-		}
-		log.info("News spider initialized!timerMap: " + timerMap);
+		ns1.setExeTime(now.plusMinutes(rand.nextInt(10)));
+		ns2.setExeTime(now.plusMinutes(rand.nextInt(10)));
+		ns3.setExeTime(now.plusMinutes(rand.nextInt(10)));
+
+		spiderList.add(ns1);
+		spiderList.add(ns2);
+		spiderList.add(ns3);
+		log.info("News spider initialing....NewsSpiderMap: " + spiderList);
 	}
 
 	/*
@@ -96,10 +99,12 @@ public class NewsSpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		
+
 		long timestamp = System.currentTimeMillis();
 		hb.setNewsSpiderBeat(timestamp);
-		if (Queue.proxyQueue.size() > 10 && newsSpiderQueue.size() < 6) {
+		hb.setNewsSpiderExeQueueInfo(executeQueue.toString());
+		hb.setNewsSpiderPoolInfo(cacheThreadPool.toString());
+		if (Queue.proxyQueue.size() > 10 && executeQueue.size() < 6) {
 			try {
 				offerSpiderToQueue();
 			} catch (InstantiationException e) {
@@ -108,31 +113,34 @@ public class NewsSpiderDispatcher implements Runnable {
 				log.error(e.getMessage());
 			}
 		}
-		if (newsSpiderQueue.size() > 0) {
-			AbstractNewsSpider newsSpider = newsSpiderQueue.poll();
+		if (executeQueue.size() > 0) {
+			AbstractNewsSpider newsSpider = executeQueue.poll();
 			log.info("Executing " + newsSpider);
-			SpiderDispatcher.cacheThreadPool.execute(newsSpider);
+			cacheThreadPool.execute(newsSpider);
 		}
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void offerSpiderToQueue() throws InstantiationException, IllegalAccessException {
 		DateTime now = new DateTime();
-		Set<Integer> snSet = timerMap.keySet();
-		Iterator<Integer> it = snSet.iterator();
+		Iterator<NewsSpiderWithTime> it = spiderList.iterator();
 		while (it.hasNext()) {
-			int sn = it.next();
-			DateTime timeOfSpider = timerMap.get(sn);
-			@SuppressWarnings("unchecked")
-			Class<AbstractNewsSpider> newsSpider = newsSpiderMap.get(sn);
-			if (now.isAfter(timeOfSpider)) {
-				AbstractNewsSpider spider = newsSpider.newInstance();
-				newsSpiderQueue.offer(spider);
-				int delayTime = spider.getDelayFactor() + rand.nextInt(30);
-				DateTime nextExeTime = timerMap.get(sn).plusMinutes(delayTime);
-				timerMap.put(sn, nextExeTime);
-				log.info("Offer spider to queue to execute!" + newsSpiderMap.get(sn) + "next execute time is "
-						+ timerMap.get(sn));
+
+			NewsSpiderWithTime spider = it.next();
+			DateTime exeTime = spider.getExeTime();
+
+			if (now.isAfter(exeTime)) {
+
+				AbstractNewsSpider spiderIns = (AbstractNewsSpider) spider.getClazz().newInstance();
+				executeQueue.offer(spiderIns);
+
+				int delayTime = spiderIns.getDelayFactor() + rand.nextInt(30);
+				DateTime nextExeTime = exeTime.plusMinutes(delayTime);
+				spider.setExeTime(nextExeTime);
+
+				log.info("Offer " + spider.getClazz().getSimpleName() + " to queue! Next exe time:"
+						+ spider.getExeTime());
 			}
 		}
 	}

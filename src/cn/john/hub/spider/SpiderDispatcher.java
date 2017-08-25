@@ -52,7 +52,7 @@ public class SpiderDispatcher {
 
 	@PostConstruct
 	private void startDeamon() {
-
+		
 		ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(3);
 		// 负责维护代理ip
 		stpe.scheduleWithFixedDelay(psd, 0, 10, TimeUnit.SECONDS);

@@ -12,9 +12,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
     
     <select id="listNews" resultType="cn.john.hub.domain.NewsVO">
-        SELECT title,brief,url,siteName,siteAddr
+        SELECT title,brief,url,siteName,siteAddr,create_time as time
         FROM news JOIN site ON news.siteId = site.siteId
         ORDER BY create_time DESC
         LIMIT 20
+    </select>
+    
+    <select id="getNewsCount" resultType="int">
+        SELECT count(*) FROM news
     </select>
 </mapper>

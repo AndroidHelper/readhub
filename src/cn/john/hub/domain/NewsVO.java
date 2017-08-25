@@ -32,6 +32,7 @@ public class NewsVO {
 	private String url;
 	private String siteName;
 	private String siteAddr;
+	private String time;
 
 	public String getTitle() {
 		return title;
@@ -73,10 +74,18 @@ public class NewsVO {
 		this.siteAddr = siteAddr;
 	}
 
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
+	}
+
 	@Override
 	public String toString() {
 		return "NewsVO [title=" + title + ", brief=" + brief + ", url=" + url + ", siteName=" + siteName + ", siteAddr="
-				+ siteAddr + "]";
+				+ siteAddr + ", time=" + time + "]";
 	}
 
 }

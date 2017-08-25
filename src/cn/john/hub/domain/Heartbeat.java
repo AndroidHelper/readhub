@@ -1,12 +1,6 @@
 /**  
 
- * Copyright © 2017SITI. All rights reserved.
-
- *
-
  * @Title: Heartbeat.java
-
- * @Prject: Test3
 
  * @Package: cn.john.hub.util
 
@@ -37,39 +31,77 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class Heartbeat {
-	
-	private long newsSaverBeat;
-	private long newsSpiderBeat;
-	private long proxySpiderBeat;
 
-	public long getNewsSaverBeat() {
+	private Long newsSaverBeat;
+	private Long newsSpiderBeat;
+	private Long proxySpiderBeat;
+	private String newsSpiderPoolInfo;
+	private String proxySpiderPoolInfo;
+	private String newsSpiderExeQueueInfo;
+	private Integer lastSavedNewsCount;
+
+	public Long getNewsSaverBeat() {
 		return newsSaverBeat;
 	}
 
-	public void setNewsSaverBeat(long newsSaverBeat) {
+	public void setNewsSaverBeat(Long newsSaverBeat) {
 		this.newsSaverBeat = newsSaverBeat;
 	}
 
-	public long getNewsSpiderBeat() {
+	public Long getNewsSpiderBeat() {
 		return newsSpiderBeat;
 	}
 
-	public void setNewsSpiderBeat(long newsSpiderBeat) {
+	public void setNewsSpiderBeat(Long newsSpiderBeat) {
 		this.newsSpiderBeat = newsSpiderBeat;
 	}
 
-	public long getProxySpiderBeat() {
+	public Long getProxySpiderBeat() {
 		return proxySpiderBeat;
 	}
 
-	public void setProxySpiderBeat(long proxySpiderBeat) {
+	public void setProxySpiderBeat(Long proxySpiderBeat) {
 		this.proxySpiderBeat = proxySpiderBeat;
+	}
+
+	public String getNewsSpiderPoolInfo() {
+		return newsSpiderPoolInfo;
+	}
+
+	public void setNewsSpiderPoolInfo(String newsSpiderPoolInfo) {
+		this.newsSpiderPoolInfo = newsSpiderPoolInfo;
+	}
+
+	public String getProxySpiderPoolInfo() {
+		return proxySpiderPoolInfo;
+	}
+
+	public void setProxySpiderPoolInfo(String proxySpiderPoolInfo) {
+		this.proxySpiderPoolInfo = proxySpiderPoolInfo;
+	}
+
+	public String getNewsSpiderExeQueueInfo() {
+		return newsSpiderExeQueueInfo;
+	}
+
+	public void setNewsSpiderExeQueueInfo(String newsSpiderExeQueueInfo) {
+		this.newsSpiderExeQueueInfo = newsSpiderExeQueueInfo;
+	}
+
+	public Integer getLastSavedNewsCount() {
+		return lastSavedNewsCount;
+	}
+
+	public void setLastSavedNewsCount(Integer lastSavedNewsCount) {
+		this.lastSavedNewsCount = lastSavedNewsCount;
 	}
 
 	@Override
 	public String toString() {
 		return "Heartbeat [newsSaverBeat=" + newsSaverBeat + ", newsSpiderBeat=" + newsSpiderBeat + ", proxySpiderBeat="
-				+ proxySpiderBeat + "]";
+				+ proxySpiderBeat + ", newsSpiderPoolInfo=" + newsSpiderPoolInfo + ", proxySpiderPoolInfo="
+				+ proxySpiderPoolInfo + ", newsSpiderExeQueueInfo=" + newsSpiderExeQueueInfo + ", lastSavedNewsCount="
+				+ lastSavedNewsCount + "]";
 	}
 
 }

@@ -63,23 +63,27 @@ public class NewsController {
 
 	@RequestMapping("/listMonitorItems")
 	@ResponseBody
-	public HashMap<String, Integer> listMonitorItems() {
-		HashMap<String, Integer> map = new HashMap<>();
+	public HashMap<String, Object> listMonitorItems() {
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("nsq", hb.getNewsSpiderExeQueueInfo());
+		map.put("nsp", hb.getNewsSpiderPoolInfo());
+		map.put("psp", hb.getProxySpiderPoolInfo());
+		map.put("lsnc", hb.getLastSavedNewsCount());
 		long now = System.currentTimeMillis();
 		if ((now - hb.getNewsSaverBeat()) / 1000 > 180) {
-			map.put("ns", 0);
+			map.put("ns", "Unknown");
 		} else {
-			map.put("ns", 1);
+			map.put("ns", "Running");
 		}
 		if ((now - hb.getNewsSpiderBeat()) / 1000 > 60) {
-			map.put("nsd", 0);
+			map.put("nsd", "Unknown");
 		} else {
-			map.put("nsd", 1);
+			map.put("nsd", "Running");
 		}
 		if ((now - hb.getProxySpiderBeat()) / 1000 > 60) {
-			map.put("psd", 0);
+			map.put("psd", "Unknown");
 		} else {
-			map.put("psd", 1);
+			map.put("psd", "Running");
 		}
 		return map;
 	}

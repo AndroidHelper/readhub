@@ -60,20 +60,24 @@ public class NewsServiceImpl implements NewsService {
 	 * 
 	 */
 	@Override
-	public void saveNews(List<NewsDO> newsList) {
+	public int saveNews(List<NewsDO> newsList) {
+		int before = nMapper.getNewsCount();
 		nMapper.saveNews(newsList);
+		int after = nMapper.getNewsCount();
+		return after - before;
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: listNews
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.service.NewsService#listNews()
-	
+	 * 
 	 */
 	@Override
 	public List<NewsVO> listNews() {

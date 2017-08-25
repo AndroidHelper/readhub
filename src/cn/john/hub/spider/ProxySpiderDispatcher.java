@@ -17,6 +17,8 @@ package cn.john.hub.spider;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,6 +46,7 @@ import cn.john.hub.spider.proxy.XiCiProxySpider;
 public class ProxySpiderDispatcher implements Runnable {
 
 	private static Logger log = LogManager.getLogger("logger");
+	private ExecutorService cacheThreadPool;
 	private HashMap<Integer, AbstractProxySpider> proxyMap;
 	private AtomicBoolean crawlingFlag;
 
@@ -51,6 +54,7 @@ public class ProxySpiderDispatcher implements Runnable {
 	private Heartbeat hb;
 
 	public ProxySpiderDispatcher() {
+		cacheThreadPool = Executors.newCachedThreadPool();
 		crawlingFlag = new AtomicBoolean(false);
 		proxyMap = new HashMap<Integer, AbstractProxySpider>();
 		init();
@@ -82,6 +86,7 @@ public class ProxySpiderDispatcher implements Runnable {
 	public void run() {
 		long timestamp = System.currentTimeMillis();
 		hb.setProxySpiderBeat(timestamp);
+		hb.setProxySpiderPoolInfo(cacheThreadPool.toString());
 		synchronized (crawlingFlag) {
 			if (isLackOfProxy()) {
 				startProxySpider();
@@ -109,7 +114,7 @@ public class ProxySpiderDispatcher implements Runnable {
 		AbstractProxySpider proxySpider = proxyMap.get(randKey);
 		log.info("Proxy spider get!Detail: " + proxySpider);
 		// 启动
-		SpiderDispatcher.cacheThreadPool.execute(proxySpider);
+		cacheThreadPool.execute(proxySpider);
 		try {
 			log.info("A proxy spider has been launched! Waiting for it to finish crawling...");
 			crawlingFlag.wait();

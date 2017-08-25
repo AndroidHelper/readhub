@@ -33,7 +33,7 @@ import cn.john.hub.domain.NewsVO;
  * 
  */
 public interface NewsService {
-	void saveNews(List<NewsDO> newsList);
+	int saveNews(List<NewsDO> newsList);
 
 	List<NewsVO> listNews();
 }

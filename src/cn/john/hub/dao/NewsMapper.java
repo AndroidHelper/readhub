@@ -32,8 +32,10 @@ import cn.john.hub.domain.NewsVO;
  * 
  */
 public interface NewsMapper {
-	
+
 	void saveNews(List<NewsDO> newsList);
 
 	List<NewsVO> listNews();
+
+	int getNewsCount();
 }
