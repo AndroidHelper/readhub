@@ -22,12 +22,14 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import cn.john.hub.domain.Heartbeat;
 import cn.john.hub.spider.news.CnBetaSpider;
 import cn.john.hub.spider.news.TaiMediaSpider;
 import cn.john.hub.spider.news.TechWebSpider;
@@ -44,15 +46,17 @@ import cn.john.hub.spider.news.TechWebSpider;
  * 
  * 
  */
+@Component
 public class NewsSpiderDispatcher implements Runnable {
 	private final Logger log = LogManager.getLogger("logger");
 	private Random rand;
 	@SuppressWarnings("rawtypes")
 	private HashMap<Integer, Class> newsSpiderMap;
 	private LinkedList<AbstractNewsSpider> newsSpiderQueue;
-
+	@Autowired
+	private Heartbeat hb;
 	public Map<Integer, DateTime> timerMap;
-
+	
 	@SuppressWarnings("rawtypes")
 	public NewsSpiderDispatcher() {
 		newsSpiderMap = new HashMap<Integer, Class>();
@@ -84,7 +88,7 @@ public class NewsSpiderDispatcher implements Runnable {
 	 * 
 	 * @Title: run
 	 * 
-	 * @Description: TODO
+	 * @Description:10秒执行一次
 	 * 
 	 * 
 	 * @see java.lang.Runnable#run()
@@ -92,31 +96,24 @@ public class NewsSpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		log.info("News Spider dispatcher start!10 secends a loop!");
-		while (true) {
+		
+		long timestamp = System.currentTimeMillis();
+		hb.setNewsSpiderBeat(timestamp);
+		if (Queue.proxyQueue.size() > 10 && newsSpiderQueue.size() < 6) {
 			try {
-				TimeUnit.SECONDS.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (Queue.proxyQueue.size() > 10 && newsSpiderQueue.size() < 6) {
-				try {
-					offerSpiderToQueue();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			if (newsSpiderQueue.size() > 0) {
-				AbstractNewsSpider newsSpider = newsSpiderQueue.poll();
-				log.info("Executing " + newsSpider);
-				SpiderDispatcher.cacheThreadPool.execute(newsSpider);
+				offerSpiderToQueue();
+			} catch (InstantiationException e) {
+				log.error(e.getMessage());
+			} catch (IllegalAccessException e) {
+				log.error(e.getMessage());
 			}
 		}
+		if (newsSpiderQueue.size() > 0) {
+			AbstractNewsSpider newsSpider = newsSpiderQueue.poll();
+			log.info("Executing " + newsSpider);
+			SpiderDispatcher.cacheThreadPool.execute(newsSpider);
+		}
+
 	}
 
 	private void offerSpiderToQueue() throws InstantiationException, IllegalAccessException {

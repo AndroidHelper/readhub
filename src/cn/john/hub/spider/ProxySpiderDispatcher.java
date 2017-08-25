@@ -17,12 +17,14 @@ package cn.john.hub.spider;
 
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import cn.john.hub.domain.Heartbeat;
 import cn.john.hub.spider.proxy.DoubleSixProxySpider;
 import cn.john.hub.spider.proxy.XiCiProxySpider;
 
@@ -38,12 +40,15 @@ import cn.john.hub.spider.proxy.XiCiProxySpider;
  * 
  * 
  */
+@Component
 public class ProxySpiderDispatcher implements Runnable {
 
 	private static Logger log = LogManager.getLogger("logger");
 	private HashMap<Integer, AbstractProxySpider> proxyMap;
-
 	private AtomicBoolean crawlingFlag;
+
+	@Autowired
+	private Heartbeat hb;
 
 	public ProxySpiderDispatcher() {
 		crawlingFlag = new AtomicBoolean(false);
@@ -67,7 +72,7 @@ public class ProxySpiderDispatcher implements Runnable {
 	 * 
 	 * @Title: run
 	 * 
-	 * @Description: TODO
+	 * @Description: 10秒执行一次
 	 * 
 	 * 
 	 * @see java.lang.Runnable#run()
@@ -75,18 +80,11 @@ public class ProxySpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		log.info("Proxy dispatcher is started! 10 seconds a loop!");
-		while (true) {
-			// 最大化同步块，以节约CPU
-			synchronized (crawlingFlag) {
-				try {
-					TimeUnit.SECONDS.sleep(5);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				if (isLackOfProxy()) {
-					startProxySpider();
-				}
+		long timestamp = System.currentTimeMillis();
+		hb.setProxySpiderBeat(timestamp);
+		synchronized (crawlingFlag) {
+			if (isLackOfProxy()) {
+				startProxySpider();
 			}
 		}
 	}
@@ -105,7 +103,7 @@ public class ProxySpiderDispatcher implements Runnable {
 		Random rand = new Random();
 		int randInt = rand.nextInt(10);
 		int randKey = 0;
-		if(randInt<=7){
+		if (randInt <= 7) {
 			randKey = 1;
 		}
 		AbstractProxySpider proxySpider = proxyMap.get(randKey);
@@ -120,5 +118,4 @@ public class ProxySpiderDispatcher implements Runnable {
 			e.printStackTrace();
 		}
 	}
-
 }

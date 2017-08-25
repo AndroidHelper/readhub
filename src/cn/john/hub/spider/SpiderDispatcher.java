@@ -16,6 +16,8 @@ package cn.john.hub.spider;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -40,17 +42,25 @@ import org.springframework.stereotype.Component;
 public class SpiderDispatcher {
 	private static Logger log = LogManager.getLogger("logger");
 	public static ExecutorService cacheThreadPool = Executors.newCachedThreadPool();
+	
 	@Autowired
 	private NewsSaver ns;
+	@Autowired
+	private NewsSpiderDispatcher nsd;
+	@Autowired
+	private ProxySpiderDispatcher psd;
+
 	@PostConstruct
 	private void startDeamon() {
-		//负责维护代理ip
-		cacheThreadPool.execute(new ProxySpiderDispatcher());
-		//负责爬取新闻信息
-		cacheThreadPool.execute(new NewsSpiderDispatcher());
-		//负责存储数据
-		cacheThreadPool.execute(ns);
-		
+
+		ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(3);
+		// 负责维护代理ip
+		stpe.scheduleWithFixedDelay(psd, 0, 10, TimeUnit.SECONDS);
+		// 负责爬取新闻信息
+		stpe.scheduleWithFixedDelay(nsd, 30, 10, TimeUnit.SECONDS);
+		// 负责存储数据
+		stpe.scheduleWithFixedDelay(ns, 180, 60, TimeUnit.SECONDS);
+
 		log.info("Spider controller is constructed!proxy spider,news spider and news saver are started!");
 	}
 }
