@@ -98,10 +98,10 @@ public class NewsSpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		log.info("News Spider dispatcher start!5 secends a loop!");
+		log.info("News Spider dispatcher start!10 secends a loop!");
 		while (true) {
 			try {
-				TimeUnit.SECONDS.sleep(5);
+				TimeUnit.SECONDS.sleep(10);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -119,11 +119,7 @@ public class NewsSpiderDispatcher implements Runnable {
 			}
 			if (newsSpiderQueue.size() > 0) {
 				AbstractNewsSpider newsSpider = newsSpiderQueue.poll();
-				int delayTime = newsSpider.getDelayFactor() + rand.nextInt(30);
-				int sn = newsSpider.getSerialNumber();
-				DateTime nextExeTime = timerMap.get(sn).plusMinutes(delayTime);
-				timerMap.put(sn, nextExeTime);
-				log.info("Executing " + newsSpider + "and it's next execute time is " + timerMap.get(sn));
+				log.info("Executing " + newsSpider);
 				SpiderDispatcher.cacheThreadPool.execute(newsSpider);
 			}
 		}
@@ -139,8 +135,12 @@ public class NewsSpiderDispatcher implements Runnable {
 			@SuppressWarnings("unchecked")
 			Class<AbstractNewsSpider> newsSpider = newsSpiderMap.get(sn);
 			if (now.isAfter(timeOfSpider)) {
-				newsSpiderQueue.offer(newsSpider.newInstance());
-				log.info("Offer spider to queue!" + newsSpiderMap.get(sn) + "And it's execute time is "
+				AbstractNewsSpider spider = newsSpider.newInstance();
+				newsSpiderQueue.offer(spider);
+				int delayTime = spider.getDelayFactor() + rand.nextInt(30);
+				DateTime nextExeTime = timerMap.get(sn).plusMinutes(delayTime);
+				timerMap.put(sn, nextExeTime);
+				log.info("Offer spider to queue to execute!" + newsSpiderMap.get(sn) + "next execute time is "
 						+ timerMap.get(sn));
 			}
 		}
