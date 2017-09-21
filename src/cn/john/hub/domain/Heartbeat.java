@@ -32,13 +32,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class Heartbeat {
 
-	private long newsSaverBeat;
-	private long newsSpiderBeat;
-	private long proxySpiderBeat;
-	private String newsSpiderPoolInfo;
-	private String proxySpiderPoolInfo;
-	private String newsSpiderExeQueueInfo;
-	private Integer lastSavedNewsCount;
+	private volatile long newsSaverBeat;
+	private volatile long newsSpiderBeat;
+	private volatile long proxySpiderBeat;
+	private volatile String newsSpiderPoolInfo;
+	private volatile String proxySpiderPoolInfo;
+	private volatile String newsSpiderExeQueueInfo;
+	private volatile Integer lastSavedNewsCount;
 
 	public long getNewsSaverBeat() {
 		return newsSaverBeat;

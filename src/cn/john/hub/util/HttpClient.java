@@ -108,4 +108,13 @@ public class HttpClient {
 			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "HttpClient [proxyHost=" + proxyHost + ", proxy=" + proxy + ", httpClient=" + httpClient
+				+ ", defaultReqCfg=" + defaultReqCfg + "]";
+	}
+	
+	
+	
 }

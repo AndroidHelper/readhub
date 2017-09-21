@@ -39,7 +39,7 @@ import cn.john.hub.service.NewsService;
  */
 @Component
 public class NewsSaver implements Runnable {
-	private static Logger log = LogManager.getLogger("logger");
+	private static Logger log = LogManager.getLogger("newsaver");
 	@Autowired
 	private NewsService nService;
 	@Autowired
@@ -58,13 +58,16 @@ public class NewsSaver implements Runnable {
 	 */
 	@Override
 	public void run() {
-
+		
 		long timestamp = System.currentTimeMillis();
+		log.info("news saver start working...");
 		hb.setNewsSaverBeat(timestamp);
 		if (Queue.newsQueue.size() > 0) {
 			List<NewsDO> newsList = null;
 			try {
+				log.info("taking news from queue...");
 				newsList = Queue.newsQueue.take();
+				log.info("got newsList!");				
 			} catch (InterruptedException e) {
 				log.error(e.getMessage());
 			}
@@ -72,6 +75,7 @@ public class NewsSaver implements Runnable {
 			hb.setLastSavedNewsCount(savedCount);
 			log.info(savedCount + " news saved!And newsQueue size is " + Queue.newsQueue.size());
 		}
+		log.info("news saver has done it's job!");
 	}
 
 }

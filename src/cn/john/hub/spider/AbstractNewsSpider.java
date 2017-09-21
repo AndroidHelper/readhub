@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cn.john.hub.domain.NewsDO;
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.util.HttpClient;
@@ -35,7 +38,9 @@ import cn.john.hub.util.HttpClient;
  * 
  */
 public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
-
+	
+	protected static final Logger log = LogManager.getLogger("newsSpider");
+	
 	private static LinkedBlockingQueue<List<NewsDO>> newsQueue;
 
 	public AbstractNewsSpider() {

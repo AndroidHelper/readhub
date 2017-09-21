@@ -20,6 +20,9 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.util.HttpClient;
 
@@ -37,6 +40,8 @@ import cn.john.hub.util.HttpClient;
  */
 public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 	
+	protected static final Logger log = LogManager.getLogger("proxySpider");
+	
 	protected Random rand;
 
 	protected AtomicBoolean crawlingFlag;
@@ -49,7 +54,9 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 	public void run() {
 		log.info("Start fetching proxy from "+site());
 		synchronized(crawlingFlag){
+			log.debug("execute super class run...");
 			super.run();
+			log.debug("finished!notify..");
 			crawlingFlag.notify();
 		}
 	}
@@ -60,6 +67,7 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 		if (proxy != null) {
 			log.info("Fetching proxys using proxy ip...");
 			httpClient = new HttpClient(proxy);
+			log.debug("httpclient init finished: "+httpClient);
 		} else {
 			log.info("Fetching proxys using local ip address...");
 			httpClient = new HttpClient();

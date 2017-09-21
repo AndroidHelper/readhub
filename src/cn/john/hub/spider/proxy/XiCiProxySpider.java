@@ -96,6 +96,8 @@ public class XiCiProxySpider extends AbstractProxySpider{
 			proxy.setPort((String) map.get(3));
 			dataList.add(proxy);
 		}
+		
+		log.info("parse proxy html completed!");
 	}
 
 	@Override

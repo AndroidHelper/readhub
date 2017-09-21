@@ -120,7 +120,7 @@ public class ProxySpiderDispatcher implements Runnable {
 			crawlingFlag.wait();
 			log.info("proxy spider has done it's work!");
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 	}
 }

@@ -65,8 +65,7 @@ public abstract class AbstractSpider<T> implements Runnable {
 			try {
 				proxyQueue.put(proxy);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error(e.getMessage());
 			}
 		}
 		return s;

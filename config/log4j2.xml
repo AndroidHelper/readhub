@@ -4,13 +4,35 @@
 		<Console name="Console">
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] -%F(%L) -%m%n" />
 		</Console>
-		<RollingFile name="logger" fileName="D:\\logs\\readhub.log"
-			filePattern="D:\\logs\\$${date:yyyy-MM}\\app-%d{MM-dd-yyyy}-%i.log">
+		<RollingFile name="logger" fileName="/alidata/log/readhub/logger/logger.log"
+			filePattern="/alidata/log/readhub/logger/$${date:yyyy-MM}/logger-%d{MM-dd-yyyy}-%i.log">
 			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] - %c -%F(%L) -%m%n"></PatternLayout>
 			<SizeBasedTriggeringPolicy size="10MB" />
 			<DefaultRolloverStrategy max="20" />
 		</RollingFile>
+		<RollingFile name="newsaver" fileName="/alidata/log/readhub/newsaver/newsaver.log"
+			filePattern="/alidata/log/readhub/newsaver/$${date:yyyy-MM}/newsaver-%d{MM-dd-yyyy}-%i.log">
+			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] - %c -%F(%L) -%m%n"></PatternLayout>
+			<SizeBasedTriggeringPolicy size="10MB" />
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		<RollingFile name="proxySpider" fileName="/alidata/log/readhub/proxySpider/proxySpider.log"
+			filePattern="/alidata/log/readhub/proxySpider/$${date:yyyy-MM}/proxySpider-%d{MM-dd-yyyy}-%i.log">
+			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] - %c -%F(%L) -%m%n"></PatternLayout>
+			<SizeBasedTriggeringPolicy size="10MB" />
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		<RollingFile name="newsSpider" fileName="/alidata/log/readhub/newsSpider/newsSpider.log"
+			filePattern="/alidata/log/readhub/newsSpider/$${date:yyyy-MM}/newsSpider-%d{MM-dd-yyyy}-%i.log">
+			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] - %c -%F(%L) -%m%n"></PatternLayout>
+			<SizeBasedTriggeringPolicy size="10MB" />
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		
 	</Appenders>
 	<Loggers>
 		<Root level="debug">
@@ -18,6 +40,15 @@
 		</Root>
 		<Logger name="logger" level="debug">
 			<AppenderRef ref="logger" />
+		</Logger>
+		<Logger name="newsaver" level="debug">
+			<AppenderRef ref="newsaver" />
+		</Logger>
+		<Logger name="proxySpider" level="debug">
+			<AppenderRef ref="proxySpider" />
+		</Logger>
+		<Logger name="newsSpider" level="debug">
+			<AppenderRef ref="newsSpider" />
 		</Logger>
 	</Loggers>
 </Configuration>
