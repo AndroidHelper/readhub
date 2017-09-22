@@ -4,51 +4,28 @@
 		<Console name="Console">
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] -%F(%L) -%m%n" />
 		</Console>
-		<RollingFile name="logger" fileName="/alidata/log/readhub/logger/logger.log"
-			filePattern="/alidata/log/readhub/logger/$${date:yyyy-MM}/logger-%d{MM-dd-yyyy}-%i.log">
+		<RollingFile name="spider" fileName="/alidata/log/readhub/spider/spider.log"
+			filePattern="/alidata/log/readhub/spider/$${date:yyyy-MM}/spider-%d{MM-dd-yyyy}.log">
 			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] - %c -%F(%L) -%m%n"></PatternLayout>
-			<SizeBasedTriggeringPolicy size="10MB" />
-			<DefaultRolloverStrategy max="20" />
+			<TimeBasedTriggeringPolicy modulate="true" interval="1"/>
 		</RollingFile>
-		<RollingFile name="newsaver" fileName="/alidata/log/readhub/newsaver/newsaver.log"
-			filePattern="/alidata/log/readhub/newsaver/$${date:yyyy-MM}/newsaver-%d{MM-dd-yyyy}-%i.log">
+		<RollingFile name="web" fileName="/alidata/log/readhub/web/web.log"
+			filePattern="/alidata/log/readhub/web/$${date:yyyy-MM}/web-%d{MM-dd-yyyy}.log">
 			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] - %c -%F(%L) -%m%n"></PatternLayout>
-			<SizeBasedTriggeringPolicy size="10MB" />
-			<DefaultRolloverStrategy max="20" />
+			<TimeBasedTriggeringPolicy modulate="true" interval="1"/>
 		</RollingFile>
-		<RollingFile name="proxySpider" fileName="/alidata/log/readhub/proxySpider/proxySpider.log"
-			filePattern="/alidata/log/readhub/proxySpider/$${date:yyyy-MM}/proxySpider-%d{MM-dd-yyyy}-%i.log">
-			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] - %c -%F(%L) -%m%n"></PatternLayout>
-			<SizeBasedTriggeringPolicy size="10MB" />
-			<DefaultRolloverStrategy max="20" />
-		</RollingFile>
-		<RollingFile name="newsSpider" fileName="/alidata/log/readhub/newsSpider/newsSpider.log"
-			filePattern="/alidata/log/readhub/newsSpider/$${date:yyyy-MM}/newsSpider-%d{MM-dd-yyyy}-%i.log">
-			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%5p] - %c -%F(%L) -%m%n"></PatternLayout>
-			<SizeBasedTriggeringPolicy size="10MB" />
-			<DefaultRolloverStrategy max="20" />
-		</RollingFile>
-		
 	</Appenders>
 	<Loggers>
 		<Root level="debug">
 			<AppenderRef ref="Console" />
 		</Root>
-		<Logger name="logger" level="debug">
-			<AppenderRef ref="logger" />
+		<Logger name="spider" level="debug">
+			<AppenderRef ref="spider" />
 		</Logger>
-		<Logger name="newsaver" level="debug">
-			<AppenderRef ref="newsaver" />
-		</Logger>
-		<Logger name="proxySpider" level="debug">
-			<AppenderRef ref="proxySpider" />
-		</Logger>
-		<Logger name="newsSpider" level="debug">
-			<AppenderRef ref="newsSpider" />
+		<Logger name="web" level="debug">
+			<AppenderRef ref="web" />
 		</Logger>
 	</Loggers>
 </Configuration>

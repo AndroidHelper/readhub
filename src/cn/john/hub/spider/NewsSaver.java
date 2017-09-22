@@ -39,7 +39,7 @@ import cn.john.hub.service.NewsService;
  */
 @Component
 public class NewsSaver implements Runnable {
-	private static Logger log = LogManager.getLogger("newsaver");
+	private static Logger log = LogManager.getLogger("spider");
 	@Autowired
 	private NewsService nService;
 	@Autowired
@@ -67,11 +67,17 @@ public class NewsSaver implements Runnable {
 			try {
 				log.info("taking news from queue...");
 				newsList = Queue.newsQueue.take();
-				log.info("got newsList!");				
+				log.info("got newsList!");
 			} catch (InterruptedException e) {
 				log.error(e.getMessage());
 			}
-			int savedCount = nService.saveNews(newsList);
+			int savedCount = 0;
+			try {
+				savedCount = nService.saveNews(newsList);
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				log.error("Error list is :"+newsList);
+			}
 			hb.setLastSavedNewsCount(savedCount);
 			log.info(savedCount + " news saved!And newsQueue size is " + Queue.newsQueue.size());
 		}

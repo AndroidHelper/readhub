@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.john.hub.dao.AccessMapper">
+	<insert id="saveAccessRecord" parameterType="String">
+		INSERT INTO
+		access_record(ip,time) VALUES(#{ip},now())
+	</insert>
+
+	<select id="listAccessRecordToday" resultType="cn.john.hub.domain.Visitor">
+		SELECT ip,concat(province," ",city) AS addr,count(ip) AS count FROM
+		access_record
+		WHERE TO_DAYS(now()) = TO_DAYS(time)
+		AND province IS NOT NULL
+		GROUP BY ip
+	</select>
+
+	<select id="listUnLocatedIp" resultType="cn.john.hub.domain.AccRcdDO">
+		SELECT id,ip FROM
+		access_record
+		WHERE province IS NULL
+		AND city IS NULL
+		AND rectangle IS NULL
+	</select>
+
+	<update id="updateIpLocation" parameterType="java.util.List">
+		<foreach collection="list" item="acc" index="index" separator=";">
+			UPDATE access_record
+			SET province = #{acc.province},
+			city =
+			#{acc.city},rectangle = #{acc.rectangle}
+			WHERE id = #{acc.id}
+		</foreach>
+	</update>
+
+</mapper>

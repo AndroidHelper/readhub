@@ -39,8 +39,6 @@ import cn.john.hub.util.HttpClient;
  */
 public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 	
-	protected static final Logger log = LogManager.getLogger("newsSpider");
-	
 	private static LinkedBlockingQueue<List<NewsDO>> newsQueue;
 
 	public AbstractNewsSpider() {

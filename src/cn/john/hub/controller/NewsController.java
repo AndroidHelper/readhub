@@ -17,6 +17,8 @@ package cn.john.hub.controller;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import cn.john.hub.domain.Heartbeat;
 import cn.john.hub.domain.NewsVO;
+import cn.john.hub.domain.Visitor;
+import cn.john.hub.service.AccessService;
 import cn.john.hub.service.NewsService;
 
 /**
@@ -43,7 +47,7 @@ public class NewsController {
 	@Autowired
 	private NewsService nService;
 	@Autowired
-	private Heartbeat hb;
+	private AccessService aService;
 
 	@RequestMapping("/index")
 	public String index() {
@@ -52,39 +56,8 @@ public class NewsController {
 
 	@RequestMapping("/news")
 	@ResponseBody
-	public List<NewsVO> getNewsJsp() {
+	public List<NewsVO> getNewsJsp(HttpServletRequest req) {
+		aService.saveAccessRecord(req.getRemoteAddr());
 		return nService.listNews();
-	}
-
-	@RequestMapping("/monitor")
-	public String monitor() {
-		return "monitor";
-	}
-
-	@RequestMapping("/listMonitorItems")
-	@ResponseBody
-	public HashMap<String, Object> listMonitorItems() {
-		HashMap<String, Object> map = new HashMap<>();
-		map.put("nsq", hb.getNewsSpiderExeQueueInfo());
-		map.put("nsp", hb.getNewsSpiderPoolInfo());
-		map.put("psp", hb.getProxySpiderPoolInfo());
-		map.put("lsnc", hb.getLastSavedNewsCount());
-		long now = System.currentTimeMillis();
-		if ((now - hb.getNewsSaverBeat()) / 1000 > 180) {
-			map.put("ns", "Unknown");
-		} else {
-			map.put("ns", "Running");
-		}
-		if ((now - hb.getNewsSpiderBeat()) / 1000 > 60) {
-			map.put("nsd", "Unknown");
-		} else {
-			map.put("nsd", "Running");
-		}
-		if ((now - hb.getProxySpiderBeat()) / 1000 > 60) {
-			map.put("psd", "Unknown");
-		} else {
-			map.put("psd", "Running");
-		}
-		return map;
 	}
 }

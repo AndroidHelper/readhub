@@ -35,29 +35,15 @@ import cn.john.hub.domain.Proxy;
  * 
  * 
  */
-public class HttpClient {
+public class HttpClient2 {
 
-	private final static Logger log = LogManager.getLogger("spider");
-	private HttpHost proxyHost;
-	private Proxy proxy;
+	private final static Logger log = LogManager.getLogger("web");
 	private CloseableHttpClient httpClient;
 	private RequestConfig defaultReqCfg = RequestConfig.custom().setSocketTimeout(5000).setConnectTimeout(5000)
 			.setConnectionRequestTimeout(5000).build();
 
-	public HttpClient() {
+	public HttpClient2() {
 		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).build();
-	}
-
-	public HttpClient(Proxy proxy) {
-		this.proxy = proxy;
-		proxyHost = new HttpHost(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
-		DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
-		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).setRoutePlanner(routePlanner)
-				.build();
-	}
-
-	public Proxy getProxy() {
-		return proxy == null ? null : proxy;
 	}
 
 	public String getData(String url) {
@@ -75,13 +61,9 @@ public class HttpClient {
 		};
 
 		HttpGet httpResq = new HttpGet(url);
-		httpResq.setHeader("User-Agent", HubConsts.USER_AGENT);
-		httpResq.setHeader("Accept", HubConsts.ACCEPT);
-		httpResq.setHeader("Accept-Encoding", HubConsts.ACCEPT_ENCODING);
-		httpResq.setHeader("Accept-Language", HubConsts.ACCEPT_LANGUAGE);
-		httpResq.setHeader("Cache-Control", HubConsts.CACHE_CONTROL);
-		httpResq.setHeader("DNT", HubConsts.DNT);
-		httpResq.setHeader("Accept-Charset", HubConsts.ACCEPT_CHARSET);
+
+		httpResq.setHeader("Content-Type", "application/json; charset=utf-8");
+		httpResq.setHeader("Authorization", HubConsts.Authorization);
 
 		try {
 			return httpClient.execute(httpResq, responseHandler);
@@ -108,13 +90,4 @@ public class HttpClient {
 			}
 		}
 	}
-
-	@Override
-	public String toString() {
-		return "HttpClient [proxyHost=" + proxyHost + ", proxy=" + proxy + ", httpClient=" + httpClient
-				+ ", defaultReqCfg=" + defaultReqCfg + "]";
-	}
-	
-	
-	
 }

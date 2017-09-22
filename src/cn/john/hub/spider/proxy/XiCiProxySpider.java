@@ -63,38 +63,43 @@ public class XiCiProxySpider extends AbstractProxySpider{
 	@Override
 	protected void parseHtml(String html) {
 		log.info("Start parsing proxy html...");
-		Document doc = Jsoup.parse(html);
-		Element news = doc.getElementById("ip_list");
-		Elements trs = news.getElementsByTag("tr");
-		List<HashMap<Integer, Object>> list = new ArrayList<HashMap<Integer, Object>>();
-		for (Element e : trs) {
-			Elements tds = e.getElementsByTag("td");
-			int i = 0;
-			HashMap<Integer, Object> map = new HashMap<Integer, Object>();
-			for (Element e1 : tds) {
-				i++;
-				if (i == 2 || i == 3 || i == 5 || i == 6) {
-					map.put(i, e1.html());
+		try {
+			Document doc = Jsoup.parse(html);
+			Element news = doc.getElementById("ip_list");
+			Elements trs = news.getElementsByTag("tr");
+			List<HashMap<Integer, Object>> list = new ArrayList<HashMap<Integer, Object>>();
+			for (Element e : trs) {
+				Elements tds = e.getElementsByTag("td");
+				int i = 0;
+				HashMap<Integer, Object> map = new HashMap<Integer, Object>();
+				for (Element e1 : tds) {
+					i++;
+					if (i == 2 || i == 3 || i == 5 || i == 6) {
+						map.put(i, e1.html());
+					}
+					if (i == 7 || i == 8) {
+						String s = e1.child(0).attr("title").trim();
+						String s1 = s.substring(0, s.length() - 1);
+						map.put(i, s1);
+					}
 				}
-				if (i == 7 || i == 8) {
-					String s = e1.child(0).attr("title").trim();
-					String s1 = s.substring(0, s.length() - 1);
-					map.put(i, s1);
+				if (i > 1) {
+					list.add(map);
 				}
 			}
-			if (i > 1) {
-				list.add(map);
+
+			Iterator<HashMap<Integer, Object>> it = list.iterator();
+
+			while (it.hasNext()) {
+				HashMap<Integer, Object> map = it.next();
+				Proxy proxy = new Proxy();
+				proxy.setIpAddr((String) map.get(2));
+				proxy.setPort((String) map.get(3));
+				dataList.add(proxy);
 			}
-		}
-
-		Iterator<HashMap<Integer, Object>> it = list.iterator();
-
-		while (it.hasNext()) {
-			HashMap<Integer, Object> map = it.next();
-			Proxy proxy = new Proxy();
-			proxy.setIpAddr((String) map.get(2));
-			proxy.setPort((String) map.get(3));
-			dataList.add(proxy);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("Parse xici proxy html failed!");
 		}
 		
 		log.info("parse proxy html completed!");

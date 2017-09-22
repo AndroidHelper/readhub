@@ -61,18 +61,23 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 	@Override
 	protected void parseHtml(String html) {
 		log.info("Parsing proxy html...");
-		Document doc = Jsoup.parse(html);
-		Element table = doc.getElementsByTag("table").get(2);
-		Elements trList = table.getElementsByTag("tr");
-		trList.remove(0);
-		Iterator<Element> it = trList.iterator();
-		while (it.hasNext()) {
-			Proxy proxy = new Proxy();
-			Element tr = it.next();
-			Elements tdList = tr.getElementsByTag("td");
-			proxy.setIpAddr(tdList.get(0).text());
-			proxy.setPort(tdList.get(1).text());
-			dataList.add(proxy);
+		try {
+			Document doc = Jsoup.parse(html);
+			Element table = doc.getElementsByTag("table").get(2);
+			Elements trList = table.getElementsByTag("tr");
+			trList.remove(0);
+			Iterator<Element> it = trList.iterator();
+			while (it.hasNext()) {
+				Proxy proxy = new Proxy();
+				Element tr = it.next();
+				Elements tdList = tr.getElementsByTag("td");
+				proxy.setIpAddr(tdList.get(0).text());
+				proxy.setPort(tdList.get(1).text());
+				dataList.add(proxy);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("Parse 66ip html failed!");
 		}
 		log.info("parse proxy html completed!");
 	}

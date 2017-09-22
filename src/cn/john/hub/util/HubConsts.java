@@ -38,4 +38,10 @@ public class HubConsts {
 	public static final String CACHE_CONTROL = "no-cache";
 	public static final String DNT = "1";
 	public static final String ACCEPT_CHARSET = "utf-8";
+	
+	
+	public static final String Authorization = "APPCODE db88c41adc774aefabd86d79ecea3224";
+	public static final String IP_API = "http://iploc.market.alicloudapi.com/v3/ip?ip=";
+	
+	
 }

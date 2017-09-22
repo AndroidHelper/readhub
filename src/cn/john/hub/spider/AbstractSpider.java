@@ -39,7 +39,7 @@ import cn.john.hub.util.HttpClient;
  */
 public abstract class AbstractSpider<T> implements Runnable {
 
-	protected static final Logger log = LogManager.getLogger("logger");
+	protected static final Logger log = LogManager.getLogger("spider");
 	protected HttpClient httpClient;
 	protected LinkedBlockingQueue<Proxy> proxyQueue = Queue.proxyQueue;
 	protected List<T> dataList = new ArrayList<T>();

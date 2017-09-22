@@ -117,24 +117,29 @@ public class TaiMediaSpider extends AbstractNewsSpider{
 	 */
 	@Override
 	protected void parseHtml(String html) {
-		// TODO Auto-generated method stub
-		Document doc = Jsoup.parse(html,site);
-		Elements lis = doc.getElementsByClass("mod-article-list clear").get(0).child(0).children();
-		Iterator<Element> it = lis.iterator();
-		while(it.hasNext()){
-			Element e = it.next();
-			NewsDO news = new NewsDO();
-			Element aTag = e.getElementsByTag("h3").get(0).child(0);
-			String title = aTag.attr("title");
-			String url = aTag.attr("abs:href");
-			String brief = e.getElementsByTag("p").get(0).text();
-			news.setBrief(brief);
-			news.setUrl(url);
-			news.setTitle(title);
-			news.setSiteId(3);
-			dataList.add(news);
+		log.info("Parsing taimedia news...");
+		try {
+			Document doc = Jsoup.parse(html,site);
+			Elements lis = doc.getElementsByClass("mod-article-list clear").get(0).child(0).children();
+			Iterator<Element> it = lis.iterator();
+			while(it.hasNext()){
+				Element e = it.next();
+				NewsDO news = new NewsDO();
+				Element aTag = e.getElementsByTag("h3").get(0).child(0);
+				String title = aTag.attr("title");
+				String url = aTag.attr("abs:href");
+				String brief = e.getElementsByTag("p").get(0).text();
+				news.setBrief(brief);
+				news.setUrl(url);
+				news.setTitle(title);
+				news.setSiteId(3);
+				dataList.add(news);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("Parse taimedia html failed!");
 		}
-		
+		log.info("Parsing taimedia news completed!");
 	}
 
 }

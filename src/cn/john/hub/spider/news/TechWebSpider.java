@@ -61,25 +61,30 @@ public class TechWebSpider extends AbstractNewsSpider{
 	@Override
 	protected void parseHtml(String html) {
 		log.info("Parsing techweb news...");
-		Document doc = Jsoup.parse(html);
-		Elements news = doc.getElementsByClass("con_list");
-		Elements news1 = news.last().getElementsByClass("con_one");
-		Iterator<Element> it = news1.iterator();
-		while (it.hasNext()) {
-			Element e = it.next();
-			Element h2 = e.getElementsByTag("h2").last();
-			Element a = h2.getElementsByTag("a").last();
-			String url = a.attr("href");
-			String title = a.html();
-			NewsDO newsDO = new NewsDO();
-			newsDO.setTitle(title);
-			newsDO.setUrl(url);
-			Elements txt = e.getElementsByClass("con_txt");
-			String brief = txt.last().getElementsByTag("p").html();
-			newsDO.setBrief(brief);
-			newsDO.setSiteId(1);
+		try {
+			Document doc = Jsoup.parse(html);
+			Elements news = doc.getElementsByClass("con_list");
+			Elements news1 = news.last().getElementsByClass("con_one");
+			Iterator<Element> it = news1.iterator();
+			while (it.hasNext()) {
+				Element e = it.next();
+				Element h2 = e.getElementsByTag("h2").last();
+				Element a = h2.getElementsByTag("a").last();
+				String url = a.attr("href");
+				String title = a.html();
+				NewsDO newsDO = new NewsDO();
+				newsDO.setTitle(title);
+				newsDO.setUrl(url);
+				Elements txt = e.getElementsByClass("con_txt");
+				String brief = txt.last().getElementsByTag("p").html();
+				newsDO.setBrief(brief);
+				newsDO.setSiteId(1);
 
-			dataList.add(newsDO);
+				dataList.add(newsDO);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("Parse techweb html failed!");
 		}
 		log.info("Parse completed!size is " + dataList.size());
 	}

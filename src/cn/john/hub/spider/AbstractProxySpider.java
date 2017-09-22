@@ -40,8 +40,6 @@ import cn.john.hub.util.HttpClient;
  */
 public abstract class AbstractProxySpider extends AbstractSpider<Proxy>{
 	
-	protected static final Logger log = LogManager.getLogger("proxySpider");
-	
 	protected Random rand;
 
 	protected AtomicBoolean crawlingFlag;

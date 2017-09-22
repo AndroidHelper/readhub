@@ -49,7 +49,7 @@ import cn.john.hub.spider.news.TechWebSpider;
  */
 @Component
 public class NewsSpiderDispatcher implements Runnable {
-	private final Logger log = LogManager.getLogger("logger");
+	private final Logger log = LogManager.getLogger("spider");
 	private ExecutorService cacheThreadPool;
 	private Random rand;
 	@SuppressWarnings("rawtypes")
@@ -99,7 +99,7 @@ public class NewsSpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-
+		
 		long timestamp = System.currentTimeMillis();
 		hb.setNewsSpiderBeat(timestamp);
 		hb.setNewsSpiderExeQueueInfo(executeQueue.toString());

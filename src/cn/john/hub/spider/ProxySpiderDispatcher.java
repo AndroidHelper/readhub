@@ -45,7 +45,7 @@ import cn.john.hub.spider.proxy.XiCiProxySpider;
 @Component
 public class ProxySpiderDispatcher implements Runnable {
 
-	private static Logger log = LogManager.getLogger("logger");
+	private static Logger log = LogManager.getLogger("spider");
 	private ExecutorService cacheThreadPool;
 	private HashMap<Integer, AbstractProxySpider> proxyMap;
 	private AtomicBoolean crawlingFlag;
@@ -84,6 +84,7 @@ public class ProxySpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
+		
 		long timestamp = System.currentTimeMillis();
 		hb.setProxySpiderBeat(timestamp);
 		hb.setProxySpiderPoolInfo(cacheThreadPool.toString());

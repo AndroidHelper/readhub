@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SpiderDispatcher {
-	private static Logger log = LogManager.getLogger("logger");
+	private static Logger log = LogManager.getLogger("spider");
 	public static ExecutorService cacheThreadPool = Executors.newCachedThreadPool();
 	
 	@Autowired

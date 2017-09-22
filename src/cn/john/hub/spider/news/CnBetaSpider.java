@@ -117,20 +117,25 @@ public class CnBetaSpider extends AbstractNewsSpider{
 	@Override
 	protected void parseHtml(String html) {
 		log.info("Parsing cnbeta html...");
-		Document doc = Jsoup.parse(html);
-		Elements items = doc.getElementsByClass("items-area").get(0).children();
-		Iterator<Element> it = items.iterator();
-		while(it.hasNext()){
-			Element e = it.next();
-			NewsDO news = new NewsDO();
-			Element aTag = e.getElementsByTag("dt").get(0).child(0);
-			news.setTitle(aTag.text());
-			news.setUrl(aTag.attr("href"));
-			Element brief = e.getElementsByTag("dd").get(0);
-			news.setBrief(brief.text());
-			news.setSiteId(2);
-			
-			dataList.add(news);
+		try {
+			Document doc = Jsoup.parse(html);
+			Elements items = doc.getElementsByClass("items-area").get(0).children();
+			Iterator<Element> it = items.iterator();
+			while(it.hasNext()){
+				Element e = it.next();
+				NewsDO news = new NewsDO();
+				Element aTag = e.getElementsByTag("dt").get(0).child(0);
+				news.setTitle(aTag.text());
+				news.setUrl(aTag.attr("href"));
+				Element brief = e.getElementsByTag("dd").get(0);
+				news.setBrief(brief.text());
+				news.setSiteId(2);
+				
+				dataList.add(news);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("Parse cnbeta html failed!");
 		}
 		log.info("Parse cnbeta news completed!size is " + dataList.size());
 	}
