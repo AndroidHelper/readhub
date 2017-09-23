@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import cn.john.hub.dao.AccessMapper;
 import cn.john.hub.domain.Heartbeat;
 import cn.john.hub.domain.Visitor;
+import cn.john.hub.service.AccessService;
 
 /**
  * 
@@ -42,7 +43,7 @@ import cn.john.hub.domain.Visitor;
 @Controller
 public class MonitorController {
 	@Autowired
-	private AccessMapper aService;
+	private AccessService aService;
 	@Autowired
 	private Heartbeat hb;
 
@@ -63,6 +64,7 @@ public class MonitorController {
 		map.put("nsp", hb.getNewsSpiderPoolInfo());
 		map.put("psp", hb.getProxySpiderPoolInfo());
 		map.put("lsnc", hb.getLastSavedNewsCount());
+		
 		long now = System.currentTimeMillis();
 		if ((now - hb.getNewsSaverBeat()) / 1000 > 180) {
 			map.put("ns", "Unknown");
@@ -78,6 +80,11 @@ public class MonitorController {
 			map.put("psd", "Unknown");
 		} else {
 			map.put("psd", "Running");
+		}
+		if ((now - hb.getIpLocaterBeat()) / 1000 > 300) {
+			map.put("ip", "Unknown");
+		} else {
+			map.put("ip", "Running");
 		}
 		return map;
 	}

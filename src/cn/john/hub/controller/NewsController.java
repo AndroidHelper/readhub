@@ -24,11 +24,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cn.john.hub.domain.AccRcdDO;
 import cn.john.hub.domain.Heartbeat;
 import cn.john.hub.domain.NewsVO;
 import cn.john.hub.domain.Visitor;
 import cn.john.hub.service.AccessService;
 import cn.john.hub.service.NewsService;
+import cn.john.hub.spider.Queue;
 
 /**
  * 
@@ -46,8 +48,6 @@ import cn.john.hub.service.NewsService;
 public class NewsController {
 	@Autowired
 	private NewsService nService;
-	@Autowired
-	private AccessService aService;
 
 	@RequestMapping("/index")
 	public String index() {
@@ -57,7 +57,9 @@ public class NewsController {
 	@RequestMapping("/news")
 	@ResponseBody
 	public List<NewsVO> getNewsJsp(HttpServletRequest req) {
-		aService.saveAccessRecord(req.getRemoteAddr());
+		AccRcdDO acc = new AccRcdDO();
+		acc.setIp(req.getRemoteAddr());
+		Queue.accQueue.add(acc);
 		return nService.listNews();
 	}
 }

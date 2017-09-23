@@ -58,25 +58,24 @@ public class NewsSaver implements Runnable {
 	 */
 	@Override
 	public void run() {
-		
+
 		long timestamp = System.currentTimeMillis();
 		log.info("news saver start working...");
 		hb.setNewsSaverBeat(timestamp);
 		if (Queue.newsQueue.size() > 0) {
 			List<NewsDO> newsList = null;
 			try {
-				log.info("taking news from queue...");
 				newsList = Queue.newsQueue.take();
-				log.info("got newsList!");
 			} catch (InterruptedException e) {
 				log.error(e.getMessage());
 			}
 			int savedCount = 0;
-			try {
-				savedCount = nService.saveNews(newsList);
-			} catch (Exception e) {
-				log.error(e.getMessage());
-				log.error("Error list is :"+newsList);
+			if (newsList.size() > 0) {
+				try {
+					savedCount = nService.saveNews(newsList);
+				} catch (Exception e) {
+					log.error(e.getMessage());
+				}
 			}
 			hb.setLastSavedNewsCount(savedCount);
 			log.info(savedCount + " news saved!And newsQueue size is " + Queue.newsQueue.size());

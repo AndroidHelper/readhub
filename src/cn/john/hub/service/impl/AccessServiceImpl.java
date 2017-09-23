@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -36,9 +38,11 @@ import com.alibaba.fastjson.JSON;
 
 import cn.john.hub.dao.AccessMapper;
 import cn.john.hub.domain.AccRcdDO;
+import cn.john.hub.domain.Heartbeat;
 import cn.john.hub.domain.IPInfo;
 import cn.john.hub.domain.Visitor;
 import cn.john.hub.service.AccessService;
+import cn.john.hub.spider.Queue;
 import cn.john.hub.util.HttpClient2;
 import cn.john.hub.util.HubConsts;
 
@@ -59,34 +63,17 @@ public class AccessServiceImpl implements AccessService {
 
 	@Autowired
 	private AccessMapper aMapper;
-
+	@Autowired
+	private Heartbeat hb;
 	private final Logger log = LogManager.getLogger("web");
-
-	private HttpClient2 httpClient = new HttpClient2();
 
 	private ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
 
 	@PostConstruct
-	private void getIPInfo() {
-		stpe.scheduleWithFixedDelay(getLocater(), 0, 5, TimeUnit.MINUTES);
+	private void locateIp() {
+		//内部类是单例模式，list不是线程安全的类，使用fixedRate,避免并发
+		stpe.scheduleAtFixedRate(getLocater(), 2, 3, TimeUnit.MINUTES);
 		log.info("ip locater started!");
-	}
-
-	/*
-	 * (non Javadoc)
-	 * 
-	 * @Title: saveAccessRecord
-	 * 
-	 * @Description: TODO
-	 * 
-	 * @param ip
-	 * 
-	 * @see cn.john.hub.service.AccessService#saveAccessRecord(java.lang.String)
-	 * 
-	 */
-	@Override
-	public void saveAccessRecord(String ip) {
-		aMapper.saveAccessRecord(ip);
 	}
 
 	/*
@@ -112,7 +99,16 @@ public class AccessServiceImpl implements AccessService {
 	}
 
 	private class IPLocater implements Runnable {
+
 		private String ipRegex = "((25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))";
+
+		private HttpClient2 httpClient;
+
+		private Random rand = new Random();
+
+		private List<AccRcdDO> accList = new ArrayList<>();
+
+		private ConcurrentLinkedQueue<AccRcdDO> accQueue = Queue.accQueue;
 
 		/*
 		 * (non Javadoc)
@@ -127,25 +123,34 @@ public class AccessServiceImpl implements AccessService {
 		 */
 		@Override
 		public void run() {
-			List<AccRcdDO> ipList = aMapper.listUnLocatedIp();
-			int size = ipList.size();
-			log.info("Starting locating ip.Count is " + size);
-			if (size > 0) {
-				Iterator<AccRcdDO> it = ipList.iterator();
-				while (it.hasNext()) {
+
+			long timestamp = System.currentTimeMillis();
+			hb.setIpLocaterBeat(timestamp);
+			
+			AccRcdDO acc = null;
+
+			try {
+				while ((acc = accQueue.poll()) != null) {
+
+					int count = accList.size();
+					if (count > 200) {
+						aMapper.saveAccessRecord(accList);
+						log.info("Saving access record... size is " + count);
+						accList.clear();
+					}
 
 					try {
-						TimeUnit.SECONDS.sleep(5);
+						TimeUnit.SECONDS.sleep(rand.nextInt(10));
 					} catch (InterruptedException e1) {
 						log.error(e1.getMessage());
 					}
 
-					AccRcdDO acc = it.next();
-
 					if (Pattern.matches(ipRegex, acc.getIp())) {
 						IPInfo info = null;
 						try {
+							httpClient = new HttpClient2();
 							info = JSON.parseObject(httpClient.getData(HubConsts.IP_API + acc.getIp()), IPInfo.class);
+							log.debug("ip info :" + info);
 						} catch (Exception e) {
 							log.error(e.getMessage());
 							log.error("Error in locating for ip:" + acc.getIp());
@@ -155,15 +160,17 @@ public class AccessServiceImpl implements AccessService {
 							acc.setProvince(info.getProvince());
 							acc.setRectangle(info.getRectangle());
 						}
-					} else {
-						log.debug(acc.getIp() + " is invalid ip!Removing it from locating queue!");
-						it.remove();
 					}
+
+					accList.add(acc);
 				}
-				if (ipList.size() > 0) {
-					aMapper.updateIpLocation(ipList);
+				if(!accList.isEmpty()){
+					aMapper.saveAccessRecord(accList);
+					log.info("Saving access record... size is " + accList.size());
+					accList.clear();
 				}
-				log.info("Locating job done!Update " + ipList.size() + " in total!");
+			} catch (Exception e) {
+				log.error(e.getMessage());
 			}
 		}
 	}

@@ -32,8 +32,5 @@ import cn.john.hub.domain.Visitor;
  * 
  */
 public interface AccessService {
-
-	void saveAccessRecord(String ip);
-
 	List<Visitor> listAccessRecordToday();
 }

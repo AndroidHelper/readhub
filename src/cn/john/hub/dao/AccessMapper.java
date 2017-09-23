@@ -34,11 +34,8 @@ import cn.john.hub.domain.Visitor;
  */
 public interface AccessMapper {
 	
-	void saveAccessRecord(String ip);
+	void saveAccessRecord(List<AccRcdDO> accList);
 
 	List<Visitor> listAccessRecordToday();
-	
-	List<AccRcdDO> listUnLocatedIp();
-	
-	void updateIpLocation(List<AccRcdDO> accList);
+
 }

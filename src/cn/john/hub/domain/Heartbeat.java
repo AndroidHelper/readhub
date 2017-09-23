@@ -35,6 +35,7 @@ public class Heartbeat {
 	private volatile long newsSaverBeat;
 	private volatile long newsSpiderBeat;
 	private volatile long proxySpiderBeat;
+	private volatile long ipLocaterBeat;
 	private volatile String newsSpiderPoolInfo;
 	private volatile String proxySpiderPoolInfo;
 	private volatile String newsSpiderExeQueueInfo;
@@ -62,6 +63,14 @@ public class Heartbeat {
 
 	public void setProxySpiderBeat(long proxySpiderBeat) {
 		this.proxySpiderBeat = proxySpiderBeat;
+	}
+
+	public long getIpLocaterBeat() {
+		return ipLocaterBeat;
+	}
+
+	public void setIpLocaterBeat(long ipLocaterBeat) {
+		this.ipLocaterBeat = ipLocaterBeat;
 	}
 
 	public String getNewsSpiderPoolInfo() {
@@ -99,9 +108,9 @@ public class Heartbeat {
 	@Override
 	public String toString() {
 		return "Heartbeat [newsSaverBeat=" + newsSaverBeat + ", newsSpiderBeat=" + newsSpiderBeat + ", proxySpiderBeat="
-				+ proxySpiderBeat + ", newsSpiderPoolInfo=" + newsSpiderPoolInfo + ", proxySpiderPoolInfo="
-				+ proxySpiderPoolInfo + ", newsSpiderExeQueueInfo=" + newsSpiderExeQueueInfo + ", lastSavedNewsCount="
-				+ lastSavedNewsCount + "]";
+				+ proxySpiderBeat + ", ipLocaterBeat=" + ipLocaterBeat + ", newsSpiderPoolInfo=" + newsSpiderPoolInfo
+				+ ", proxySpiderPoolInfo=" + proxySpiderPoolInfo + ", newsSpiderExeQueueInfo=" + newsSpiderExeQueueInfo
+				+ ", lastSavedNewsCount=" + lastSavedNewsCount + "]";
 	}
 
 }
