@@ -16,12 +16,16 @@ package cn.john.hub.spider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import cn.john.hub.domain.HttpClientException;
+import cn.john.hub.domain.ParseException;
 import cn.john.hub.domain.Proxy;
+import cn.john.hub.domain.Spider;
 import cn.john.hub.util.HttpClient;
 
 /**
@@ -37,9 +41,10 @@ import cn.john.hub.util.HttpClient;
  * 
  * 
  */
-public abstract class AbstractSpider<T> implements Runnable {
+public abstract class AbstractSpider<T> implements Callable<List<T>> {
 
 	protected static final Logger log = LogManager.getLogger("spider");
+	
 	protected HttpClient httpClient;
 	protected LinkedBlockingQueue<Proxy> proxyQueue = Queue.proxyQueue;
 	protected List<T> dataList = new ArrayList<T>();
@@ -51,17 +56,17 @@ public abstract class AbstractSpider<T> implements Runnable {
 
 	protected abstract String site();
 
-	protected String getHtml(String site){
+	protected String getHtml(String site) {
 		String s = null;
-		while(s == null){
+		while (s == null) {
 			initHttpClient();
-			log.info("httpClient initialized!Proxy queue size is "+proxyQueue.size());
+			log.info("httpClient initialized!Proxy queue size is " + proxyQueue.size());
 			s = httpClient.getData(site);
 		}
-		
+
 		Proxy proxy = httpClient.getProxy();
-		//有可能是本机ip
-		if(proxy!=null){
+		// 有可能是本机ip
+		if (proxy != null) {
 			try {
 				proxyQueue.put(proxy);
 			} catch (InterruptedException e) {
@@ -71,13 +76,14 @@ public abstract class AbstractSpider<T> implements Runnable {
 		return s;
 	}
 
-	protected abstract void parseHtml(String html);
+	protected abstract void parseHtml(String html) throws ParseException;
 
 	protected abstract void putDataToQueue();
 
 	@Override
-	public void run() {
+	public List<T> call() throws ParseException {
 		parseHtml(getHtml(site()));
 		putDataToQueue();
+		return dataList;
 	}
 }
