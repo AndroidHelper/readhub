@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import cn.john.hub.domain.Proxy;
+import cn.john.hub.spider.Queue;
 
 /**
  * 
@@ -38,11 +39,23 @@ import cn.john.hub.domain.Proxy;
 public class HttpClient {
 
 	private final static Logger log = LogManager.getLogger("spider");
-	private HttpHost proxyHost;
+
 	private Proxy proxy;
 	private CloseableHttpClient httpClient;
+
 	private RequestConfig defaultReqCfg = RequestConfig.custom().setSocketTimeout(5000).setConnectTimeout(5000)
 			.setConnectionRequestTimeout(5000).build();
+	private ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+		public String handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
+			int status = response.getStatusLine().getStatusCode();
+			if (status >= 200 && status < 300) {
+				HttpEntity entity = response.getEntity();
+				return entity != null ? EntityUtils.toString(entity, Consts.UTF_8) : null;
+			} else {
+				throw new ClientProtocolException("Unexcepted response status:" + status);
+			}
+		}
+	};
 
 	public HttpClient() {
 		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).build();
@@ -50,31 +63,15 @@ public class HttpClient {
 
 	public HttpClient(Proxy proxy) {
 		this.proxy = proxy;
-		proxyHost = new HttpHost(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
+		HttpHost proxyHost = new HttpHost(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
 		DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
-		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).setRoutePlanner(routePlanner)
-				.build();
-	}
-
-	public Proxy getProxy() {
-		return proxy == null ? null : proxy;
+		httpClient = HttpClients.custom().setDefaultRequestConfig(defaultReqCfg).setRoutePlanner(routePlanner).build();
 	}
 
 	public String getData(String url) {
 
-		ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-			public String handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
-				int status = response.getStatusLine().getStatusCode();
-				if (status >= 200 && status < 300) {
-					HttpEntity entity = response.getEntity();
-					return entity != null ? EntityUtils.toString(entity, Consts.UTF_8) : null;
-				} else {
-					throw new ClientProtocolException("Unexcepted response status:" + status);
-				}
-			}
-		};
-
 		HttpGet httpResq = new HttpGet(url);
+
 		httpResq.setHeader("User-Agent", HubConsts.USER_AGENT);
 		httpResq.setHeader("Accept", HubConsts.ACCEPT);
 		httpResq.setHeader("Accept-Encoding", HubConsts.ACCEPT_ENCODING);
@@ -84,21 +81,13 @@ public class HttpClient {
 		httpResq.setHeader("Accept-Charset", HubConsts.ACCEPT_CHARSET);
 
 		try {
-			return httpClient.execute(httpResq, responseHandler);
-		} catch (SocketTimeoutException e) {
-			log.error("Socket time out!" + e);
-			return null;
-		} catch (ConnectTimeoutException e) {
-			log.error("Connection time out!");
-			return null;
-		} catch (UnknownHostException e) {
-			log.error("You may check the network connection!" + e);
-			return null;
-		} catch (ClientProtocolException e) {
-			log.error(e);
-			return null;
+			String html = httpClient.execute(httpResq, responseHandler);
+			if (proxy != null) {
+				Queue.proxyQueue.put(proxy);
+			}
+			return html;
 		} catch (Exception e) {
-			log.error(e);
+			log.error("HttpClient Error!" + e);
 			return null;
 		} finally {
 			try {
@@ -109,12 +98,4 @@ public class HttpClient {
 		}
 	}
 
-	@Override
-	public String toString() {
-		return "HttpClient [proxyHost=" + proxyHost + ", proxy=" + proxy + ", httpClient=" + httpClient
-				+ ", defaultReqCfg=" + defaultReqCfg + "]";
-	}
-	
-	
-	
 }
