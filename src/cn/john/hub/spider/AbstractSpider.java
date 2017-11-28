@@ -44,24 +44,20 @@ import cn.john.hub.util.HttpClient;
 public abstract class AbstractSpider<T> implements Callable<List<T>> {
 
 	protected static final Logger log = LogManager.getLogger("spider");
-	
-	protected HttpClient httpClient;
+
 	protected LinkedBlockingQueue<Proxy> proxyQueue = Queue.proxyQueue;
-	protected List<T> dataList = new ArrayList<T>();
 
 	protected AbstractSpider() {
 	}
 
-	protected abstract void initHttpClient();
-
-	protected abstract String site();
-
 	protected String getHtml(String site) {
-		String s = null;
-		while (s == null) {
-			initHttpClient();
+
+		HttpClient httpClient = initHttpClient();
+		String html = null;
+		while (html == null) {
+			httpClient = initHttpClient();
 			log.info("httpClient initialized!Proxy queue size is " + proxyQueue.size());
-			s = httpClient.getData(site);
+			html = httpClient.getData(site);
 		}
 
 		Proxy proxy = httpClient.getProxy();
@@ -73,17 +69,17 @@ public abstract class AbstractSpider<T> implements Callable<List<T>> {
 				log.error(e.getMessage());
 			}
 		}
-		return s;
+		return html;
 	}
 
-	protected abstract void parseHtml(String html) throws ParseException;
+	protected abstract HttpClient initHttpClient();
 
-	protected abstract void putDataToQueue();
+	protected abstract String site();
+
+	protected abstract List<T> parseHtml(String html) throws ParseException;
 
 	@Override
 	public List<T> call() throws ParseException {
-		parseHtml(getHtml(site()));
-		putDataToQueue();
-		return dataList;
+		return parseHtml(getHtml(site()));
 	}
 }
