@@ -48,7 +48,7 @@ public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 
 	protected HttpClient getHttpClient(String site) {
 		List<Header> headers = HeaderUtil.getBrowserLikeHeaders();
-		return HttpClientFactory.createUsingProxy(site, headers);
+		return HttpClientFactory.createUsingProxy(site, headers,false);
 	}
 
 	// 用于调度

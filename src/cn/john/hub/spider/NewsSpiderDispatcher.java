@@ -83,9 +83,9 @@ public class NewsSpiderDispatcher implements Runnable {
 		ns2.setClazz(CnBetaSpider.class);
 		ns3.setClazz(TaiMediaSpider.class);
 		DateTime now = new DateTime();
-		ns1.setExeTime(now.plusMinutes(rand.nextInt(10)));
-		ns2.setExeTime(now.plusMinutes(rand.nextInt(10)));
-		ns3.setExeTime(now.plusMinutes(rand.nextInt(10)));
+		ns1.setExeTime(now.plusMinutes(rand.nextInt(1)));
+		ns2.setExeTime(now.plusMinutes(rand.nextInt(1)));
+		ns3.setExeTime(now.plusMinutes(rand.nextInt(1)));
 
 		spiderList.add(ns1);
 		spiderList.add(ns2);
@@ -106,7 +106,7 @@ public class NewsSpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-
+		System.out.println(">>>>>>>>>>>>>");
 		long timestamp = System.currentTimeMillis();
 		hb.setNewsSpiderBeat(timestamp);
 		hb.setNewsSpiderExeQueueInfo(executeQueue.toString());
@@ -124,6 +124,7 @@ public class NewsSpiderDispatcher implements Runnable {
 			AbstractNewsSpider newsSpider = executeQueue.poll();
 			log.info("Executing " + newsSpider);
 			try {
+				
 				List<NewsDO> newsList = cacheThreadPool.submit(newsSpider).get();
 				if (newsList != null && newsList.size() > 0) {
 					nService.saveNews(newsList);
@@ -150,7 +151,7 @@ public class NewsSpiderDispatcher implements Runnable {
 				executeQueue.offer(spiderIns);
 
 				int delayTime = spiderIns.getDelayFactor() + rand.nextInt(30);
-				DateTime nextExeTime = exeTime.plusMinutes(delayTime);
+				DateTime nextExeTime = exeTime.plusSeconds(delayTime);
 				spider.setExeTime(nextExeTime);
 
 				log.info("Offer " + spider.getClazz().getSimpleName() + " to queue! Next exe time:"

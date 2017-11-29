@@ -83,7 +83,7 @@ public class HttpClient {
 		} else {
 			httpClient = builder.setDefaultRequestConfig(defaultReqCfg).build();
 		}
-
+		
 		if (get) {
 			httpResq = new HttpGet(url);
 		} else {
@@ -94,10 +94,37 @@ public class HttpClient {
 	}
 
 	public String getData() {
+		
 		try {
 			return httpClient.execute(httpResq, responseHandler);
 		} catch (Exception e) {
-			log.error("HttpClient Error!" + e);
+			log.error("HttpClient Error!",e.getMessage());
+			return null;
+		} finally {
+			try {
+				httpClient.close();
+			} catch (IOException e) {
+				log.error(e);
+			}
+		}
+	}
+	
+	public String getDataForGBK() {
+		responseHandler = new ResponseHandler<String>() {
+			public String handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
+				int status = response.getStatusLine().getStatusCode();
+				if (status >= 200 && status < 300) {
+					HttpEntity entity = response.getEntity();
+					return entity != null ? EntityUtils.toString(entity, "GBK") : null;
+				} else {
+					throw new ClientProtocolException("Unexcepted response status:" + status);
+				}
+			}
+		};
+		try {
+			return httpClient.execute(httpResq, responseHandler);
+		} catch (Exception e) {
+			log.error("HttpClient Error!",e.getMessage());
 			return null;
 		} finally {
 			try {
@@ -108,35 +135,4 @@ public class HttpClient {
 		}
 	}
 
-	/*private void initHeaderBrowserLike(HttpGet httpResq, Header header) {
-		switch (header) {
-		case BROWSERLIKE:
-			httpResq.setHeader("User-Agent", HubConsts.USER_AGENT);
-			httpResq.setHeader("Accept", HubConsts.ACCEPT);
-			httpResq.setHeader("Accept-Encoding", HubConsts.ACCEPT_ENCODING);
-			httpResq.setHeader("Accept-Language", HubConsts.ACCEPT_LANGUAGE);
-			httpResq.setHeader("Cache-Control", HubConsts.CACHE_CONTROL);
-			httpResq.setHeader("DNT", HubConsts.DNT);
-			httpResq.setHeader("Accept-Charset", HubConsts.ACCEPT_CHARSET);
-			break;
-		case AUTHORIZATION:
-			httpResq.setHeader("Content-Type", "application/json; charset=utf-8");
-			httpResq.setHeader("Authorization", HubConsts.Authorization);
-			break;
-		default:
-			httpResq.setHeader("User-Agent", HubConsts.USER_AGENT);
-			httpResq.setHeader("Accept", HubConsts.ACCEPT);
-			httpResq.setHeader("Accept-Encoding", HubConsts.ACCEPT_ENCODING);
-			httpResq.setHeader("Accept-Language", HubConsts.ACCEPT_LANGUAGE);
-			httpResq.setHeader("Cache-Control", HubConsts.CACHE_CONTROL);
-			httpResq.setHeader("DNT", HubConsts.DNT);
-			httpResq.setHeader("Accept-Charset", HubConsts.ACCEPT_CHARSET);
-			break;
-		}
-	}*/
-
-	/*private enum Header {
-		BROWSERLIKE, AUTHORIZATION
-	}
-	*/
 }

@@ -37,8 +37,8 @@ public class HubConsts {
 	public static final String ACCEPT_LANGUAGE = "zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4";
 	public static final String CACHE_CONTROL = "no-cache";
 	public static final String DNT = "1";
-	public static final String ACCEPT_CHARSET = "utf-8";
-	public static final String CONTENT_TYPE = "application/json; charset=utf-8";
+	public static final String ACCEPT_CHARSET = "UTF-8";
+	public static final String CONTENT_TYPE = "application/json;charset=UTF-8";
 	
 	
 	public static final String AUTHORIZATION = "APPCODE db88c41adc774aefabd86d79ecea3224";

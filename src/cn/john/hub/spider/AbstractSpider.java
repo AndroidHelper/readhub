@@ -46,6 +46,7 @@ public abstract class AbstractSpider<T> implements Callable<List<T>> {
 	protected String getHtml(String site) {
 		String html = null;
 		while (html == null) {
+			System.out.println("get html......");
 			html = getHttpClient(site).getData();
 		}
 		return html;

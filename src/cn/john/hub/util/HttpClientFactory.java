@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.http.Header;
 
+import cn.john.hub.domain.Proxy;
 import cn.john.hub.spider.ProxyPool;
 
 /**
@@ -41,9 +42,10 @@ public class HttpClientFactory {
 		return new HttpClient(url, headers, true, null);
 	}
 
-	public static final HttpClient createUsingProxy(String url, List<Header> headers) {
+	public static final HttpClient createUsingProxy(String url, List<Header> headers, boolean unInterrupt) {
 		proxyPool = ProxyPool.getInstance();
-		return new HttpClient(url, headers, true, proxyPool.get());
+		Proxy proxy = unInterrupt ? proxyPool.getUnwait() : proxyPool.get();
+		return new HttpClient(url, headers, true, proxy);
 	}
-	
+
 }

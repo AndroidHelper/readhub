@@ -53,7 +53,7 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy> {
 		List<Header> headers = HeaderUtil.getBrowserLikeHeaders();
 		if (proxyPool.size() > 0) {
 			log.info("Fetching proxys using proxy ip...");
-			return HttpClientFactory.createUsingProxy(site, headers);
+			return HttpClientFactory.createUsingProxy(site, headers,true);
 		}
 		log.info("Fetching proxys using local ip address...");
 		return HttpClientFactory.createUsingLocalIP(site, headers);

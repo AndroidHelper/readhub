@@ -46,10 +46,11 @@ import cn.john.hub.spider.proxy.XiCiProxySpider;
 public class ProxySpiderDispatcher implements Runnable {
 
 	private static Logger log = LogManager.getLogger("spider");
-	
+
 	private ExecutorService cacheThreadPool;
 	private HashMap<Integer, AbstractProxySpider> proxyMap;
 
+	private Integer lastSiteKey = null;
 	private ProxyPool proxyPool;
 
 	public ProxySpiderDispatcher() {
@@ -84,10 +85,14 @@ public class ProxySpiderDispatcher implements Runnable {
 	@Override
 	public void run() {
 
-		while (proxyPool.size() < 20) {
+		if (proxyPool.size() < 20) {
+			System.out.println("lack of proxy! proxy size is " + proxyPool.size());
 			startProxySpider();
 		}
-
+		System.out.println("proxy size is " + proxyPool.size());
+		while (proxyPool.size() > 25) {
+			proxyPool.get();
+		}
 		proxyPool.signalSufficient();
 	}
 
@@ -100,12 +105,16 @@ public class ProxySpiderDispatcher implements Runnable {
 		if (randInt <= 7) {
 			randKey = 1;
 		}
+		if (lastSiteKey != null && lastSiteKey == randKey) {
+			randKey = lastSiteKey == 0 ? 1 : 0;
+		}
 		AbstractProxySpider proxySpider = proxyMap.get(randKey);
 		log.info("Proxy spider get!Detail: " + proxySpider);
 
 		try {
 			List<Proxy> proxyList = cacheThreadPool.submit(proxySpider).get();
 			if (proxyList != null && proxyList.size() > 0) {
+				lastSiteKey = randKey;
 				proxyPool.putAll(proxyList);
 			}
 		} catch (InterruptedException | ExecutionException e) {

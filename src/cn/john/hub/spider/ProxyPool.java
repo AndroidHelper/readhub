@@ -97,16 +97,14 @@ public class ProxyPool {
 		} finally {
 			lock.unlock();
 		}
-
-		Proxy p = null;
-		try {
-			p = pool.take();
-		} catch (InterruptedException e) {
-			LogUtil.getSpiderLogger().error(e);
-		}
-		return p;
+		return pool.poll();
 	}
-
+	
+	
+	public Proxy getUnwait(){
+		return pool.poll();
+	}
+	
 	public int size() {
 		return pool.size();
 	}

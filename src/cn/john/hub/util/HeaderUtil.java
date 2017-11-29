@@ -44,6 +44,7 @@ public class HeaderUtil {
 		list.add(new BasicHeader(HttpHeaders.CACHE_CONTROL, HubConsts.CACHE_CONTROL));
 		list.add(new BasicHeader(HttpHeaders.ACCEPT_CHARSET, HubConsts.ACCEPT_CHARSET));
 		list.add(new BasicHeader("DNT", HubConsts.DNT));
+		list.add(new BasicHeader(HttpHeaders.CONTENT_TYPE, HubConsts.CONTENT_TYPE));
 		list.add(new BasicHeader(HttpHeaders.USER_AGENT, HubConsts.USER_AGENT));
 		return list;
 	}
