@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 import cn.john.hub.domain.Heartbeat;
 import cn.john.hub.domain.NewsDO;
 import cn.john.hub.domain.NewsSpiderWithTime;
+import cn.john.hub.service.NewsService;
 import cn.john.hub.spider.news.CnBetaSpider;
 import cn.john.hub.spider.news.TaiMediaSpider;
 import cn.john.hub.spider.news.TechWebSpider;
@@ -60,6 +61,8 @@ public class NewsSpiderDispatcher implements Runnable {
 	private LinkedList<AbstractNewsSpider> executeQueue;
 	@Autowired
 	private Heartbeat hb;
+	@Autowired
+	private NewsService nService;
 
 	@SuppressWarnings("rawtypes")
 	public NewsSpiderDispatcher() {
@@ -123,7 +126,7 @@ public class NewsSpiderDispatcher implements Runnable {
 			try {
 				List<NewsDO> newsList = cacheThreadPool.submit(newsSpider).get();
 				if (newsList != null && newsList.size() > 0) {
-					
+					nService.saveNews(newsList);
 				}
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();

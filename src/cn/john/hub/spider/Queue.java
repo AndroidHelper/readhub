@@ -21,7 +21,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import cn.john.hub.domain.AccRcdDO;
 import cn.john.hub.domain.NewsDO;
-import cn.john.hub.domain.Proxy;
 
 /**
  * 
@@ -36,6 +35,5 @@ import cn.john.hub.domain.Proxy;
  * 
  */
 public class Queue {
-	public static LinkedBlockingQueue<List<NewsDO>> newsQueue = new LinkedBlockingQueue<List<NewsDO>>();
 	public static ConcurrentLinkedQueue<AccRcdDO> accQueue = new ConcurrentLinkedQueue<AccRcdDO>();
 }

@@ -66,11 +66,7 @@ public class MonitorController {
 		map.put("lsnc", hb.getLastSavedNewsCount());
 		
 		long now = System.currentTimeMillis();
-		if ((now - hb.getNewsSaverBeat()) / 1000 > 180) {
-			map.put("ns", "Unknown");
-		} else {
-			map.put("ns", "Running");
-		}
+
 		if ((now - hb.getNewsSpiderBeat()) / 1000 > 60) {
 			map.put("nsd", "Unknown");
 		} else {

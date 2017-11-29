@@ -44,8 +44,6 @@ public class SpiderDispatcher {
 	public static ExecutorService cacheThreadPool = Executors.newCachedThreadPool();
 	
 	@Autowired
-	private NewsSaver ns;
-	@Autowired
 	private NewsSpiderDispatcher nsd;
 	@Autowired
 	private ProxySpiderDispatcher psd;
@@ -58,8 +56,6 @@ public class SpiderDispatcher {
 		stpe.scheduleWithFixedDelay(psd, 0, 10, TimeUnit.SECONDS);
 		// 负责爬取新闻信息
 		stpe.scheduleWithFixedDelay(nsd, 30, 10, TimeUnit.SECONDS);
-		// 负责存储数据
-		stpe.scheduleWithFixedDelay(ns, 180, 60, TimeUnit.SECONDS);
 
 		log.info("Spider controller is constructed!proxy spider,news spider and news saver are started!");
 	}

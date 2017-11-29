@@ -18,6 +18,7 @@ package cn.john.hub.spider;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cn.john.hub.domain.Proxy;
@@ -39,8 +40,8 @@ public class ProxyPool {
 
 	private static volatile ProxyPool proxyPool;
 	private LinkedBlockingQueue<Proxy> pool;
-	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	private Condition lackCondition = lock.readLock().newCondition();
+	private ReentrantLock lock = new ReentrantLock();
+	private Condition lackCondition = lock.newCondition();
 
 	private ProxyPool() {
 		pool = new LinkedBlockingQueue<Proxy>();
@@ -88,14 +89,13 @@ public class ProxyPool {
 	 * 
 	 */
 	public Proxy get() {
-		lock.readLock().lock();
-
+		lock.lock();
 		try {
 			if (pool.size() < 20) {
 				lackCondition.awaitUninterruptibly();
 			}
 		} finally {
-			lock.readLock().unlock();
+			lock.unlock();
 		}
 
 		Proxy p = null;
@@ -112,11 +112,11 @@ public class ProxyPool {
 	}
 
 	public void signalSufficient() {
-		lock.readLock().lock();
+		lock.lock();
 		try {
 			lackCondition.signalAll();
 		} finally {
-			lock.readLock().unlock();
+			lock.unlock();
 		}
 	}
 }
