@@ -16,6 +16,8 @@
 package cn.john.hub.spider.news;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -105,10 +107,11 @@ public class SinaSpider extends AbstractNewsSpider{
 	
 	 */
 	@Override
-	protected void parseHtml(String html) {
+	protected List<NewsDO> parseHtml(String html) {
 		log.info("Parse sina html...");
 		Document doc = Jsoup.parse(html);
 		Elements divs = doc.getElementsByClass("feed-card-item");
+		List<NewsDO> newsList = new LinkedList<NewsDO>();
 		Iterator<Element> divIt = divs.iterator();
 		while(divIt.hasNext()){
 			Element e = divIt.next();
@@ -119,9 +122,10 @@ public class SinaSpider extends AbstractNewsSpider{
 			String brief = e.child(1).child(1).child(0).text();
 			news.setBrief(brief);
 			news.setSiteId(4);
-			dataList.add(news);
+			newsList.add(news);
 		}
-		log.info("Parse sina news completed!size is " + dataList.size());
+		log.info("Parse sina news completed!size is " + newsList.size());
+		return newsList;
 	}
 	
 }

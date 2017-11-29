@@ -15,6 +15,8 @@
  */
 package cn.john.hub.controller;
 
+import java.io.IOException;
+
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
@@ -35,7 +37,7 @@ import javax.websocket.server.ServerEndpoint;
 public class WebSocketController {
 	
 	@OnOpen
-	public void test(Session session){
+	public void test(Session session) throws IOException{
 		session.getBasicRemote().sendText("");
 	}
 }

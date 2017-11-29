@@ -16,7 +16,9 @@
 package cn.john.hub.spider.proxy;
 
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -42,9 +44,7 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 
 	public static final int spiderNumber = 1;
 
-	public DoubleSixProxySpider(AtomicBoolean crawlingFlag) {
-		this.crawlingFlag = crawlingFlag;
-	}
+	private Random rand = new Random();
 
 	/*
 	 * (non Javadoc)
@@ -59,13 +59,14 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 	 * 
 	 */
 	@Override
-	protected void parseHtml(String html) {
+	protected List<Proxy> parseHtml(String html) {
 		log.info("Parsing proxy html...");
 		try {
 			Document doc = Jsoup.parse(html);
 			Element table = doc.getElementsByTag("table").get(2);
 			Elements trList = table.getElementsByTag("tr");
 			trList.remove(0);
+			List<Proxy> proxyList = new LinkedList<Proxy>();
 			Iterator<Element> it = trList.iterator();
 			while (it.hasNext()) {
 				Proxy proxy = new Proxy();
@@ -73,13 +74,14 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 				Elements tdList = tr.getElementsByTag("td");
 				proxy.setIpAddr(tdList.get(0).text());
 				proxy.setPort(tdList.get(1).text());
-				dataList.add(proxy);
+				proxyList.add(proxy);
 			}
+			log.info("parse proxy html completed!");
+			return proxyList;
 		} catch (Exception e) {
-			log.error(e.getMessage());
-			log.error("Parse 66ip html failed!");
+			log.error("Parse 66ip html failed!", e);
+			return null;
 		}
-		log.info("parse proxy html completed!");
 	}
 
 	/*

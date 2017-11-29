@@ -16,19 +16,16 @@
 package cn.john.hub.service.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.http.Header;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +40,9 @@ import cn.john.hub.domain.IPInfo;
 import cn.john.hub.domain.Visitor;
 import cn.john.hub.service.AccessService;
 import cn.john.hub.spider.Queue;
-import cn.john.hub.util.HttpClient2;
+import cn.john.hub.util.HeaderUtil;
+import cn.john.hub.util.HttpClient;
+import cn.john.hub.util.HttpClientFactory;
 import cn.john.hub.util.HubConsts;
 
 /**
@@ -68,10 +67,11 @@ public class AccessServiceImpl implements AccessService {
 	private final Logger log = LogManager.getLogger("web");
 
 	private ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
+	private List<Header> headers = HeaderUtil.getNaiveAuthHeaders();
 
 	@PostConstruct
 	private void locateIp() {
-		//内部类是单例模式，list不是线程安全的类，使用fixedRate,避免并发
+		// 内部类是单例模式，list不是线程安全的类，使用fixedRate,避免并发
 		stpe.scheduleAtFixedRate(getLocater(), 2, 3, TimeUnit.MINUTES);
 		log.info("ip locater started!");
 	}
@@ -102,7 +102,7 @@ public class AccessServiceImpl implements AccessService {
 
 		private String ipRegex = "((25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))";
 
-		private HttpClient2 httpClient;
+		private HttpClient httpClient;
 
 		private Random rand = new Random();
 
@@ -126,7 +126,7 @@ public class AccessServiceImpl implements AccessService {
 
 			long timestamp = System.currentTimeMillis();
 			hb.setIpLocaterBeat(timestamp);
-			
+
 			AccRcdDO acc = null;
 
 			try {
@@ -148,8 +148,8 @@ public class AccessServiceImpl implements AccessService {
 					if (Pattern.matches(ipRegex, acc.getIp())) {
 						IPInfo info = null;
 						try {
-							httpClient = new HttpClient2();
-							info = JSON.parseObject(httpClient.getData(HubConsts.IP_API + acc.getIp()), IPInfo.class);
+							httpClient = HttpClientFactory.createUsingLocalIP(HubConsts.IP_API + acc.getIp(), headers);
+							info = JSON.parseObject(httpClient.getData(), IPInfo.class);
 							log.debug("ip info :" + info);
 						} catch (Exception e) {
 							log.error(e.getMessage());
@@ -164,7 +164,7 @@ public class AccessServiceImpl implements AccessService {
 
 					accList.add(acc);
 				}
-				if(!accList.isEmpty()){
+				if (!accList.isEmpty()) {
 					aMapper.saveAccessRecord(accList);
 					log.info("Saving access record... size is " + accList.size());
 					accList.clear();

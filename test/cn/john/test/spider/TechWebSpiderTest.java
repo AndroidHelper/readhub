@@ -1,4 +1,5 @@
 package cn.john.test.spider;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,7 +10,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.NewsDO;
+import cn.john.hub.util.HeaderUtil;
 import cn.john.hub.util.HttpClient;
+import cn.john.hub.util.HttpClientFactory;
 import cn.john.hub.util.SiteEnum;
 
 /**  
@@ -42,8 +45,9 @@ import cn.john.hub.util.SiteEnum;
  */
 public class TechWebSpiderTest {
 	public static void main(String[] args) {
-		HttpClient httpClient = new HttpClient();
-		String html = httpClient.getData(SiteEnum.TECH_WEB.siteAddr);
+		HttpClient httpClient = HttpClientFactory.createUsingLocalIP(SiteEnum.TECH_WEB.siteAddr,
+				HeaderUtil.getBrowserLikeHeaders());
+		String html = httpClient.getData();
 		Document doc = Jsoup.parse(html);
 		Elements news = doc.getElementsByClass("con_list");
 		Elements news1 = news.last().getElementsByClass("con_one");

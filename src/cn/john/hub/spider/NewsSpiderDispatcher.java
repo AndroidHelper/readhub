@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cn.john.hub.domain.Heartbeat;
+import cn.john.hub.domain.NewsDO;
 import cn.john.hub.domain.NewsSpiderWithTime;
 import cn.john.hub.spider.news.CnBetaSpider;
 import cn.john.hub.spider.news.TaiMediaSpider;
@@ -52,6 +54,7 @@ public class NewsSpiderDispatcher implements Runnable {
 	private final Logger log = LogManager.getLogger("spider");
 	private ExecutorService cacheThreadPool;
 	private Random rand;
+	private ProxyPool proxyPool;
 	@SuppressWarnings("rawtypes")
 	private List<NewsSpiderWithTime> spiderList;
 	private LinkedList<AbstractNewsSpider> executeQueue;
@@ -64,11 +67,12 @@ public class NewsSpiderDispatcher implements Runnable {
 		spiderList = new ArrayList<NewsSpiderWithTime>();
 		executeQueue = new LinkedList<AbstractNewsSpider>();
 		rand = new Random();
+		proxyPool = ProxyPool.getInstance();
 		init();
 	}
 
 	private void init() {
-		//注册newsspider类的实例
+		// 注册newsspider类的实例
 		NewsSpiderWithTime<TechWebSpider> ns1 = new NewsSpiderWithTime<TechWebSpider>();
 		NewsSpiderWithTime<CnBetaSpider> ns2 = new NewsSpiderWithTime<CnBetaSpider>();
 		NewsSpiderWithTime<TaiMediaSpider> ns3 = new NewsSpiderWithTime<TaiMediaSpider>();
@@ -99,12 +103,12 @@ public class NewsSpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		
+
 		long timestamp = System.currentTimeMillis();
 		hb.setNewsSpiderBeat(timestamp);
 		hb.setNewsSpiderExeQueueInfo(executeQueue.toString());
 		hb.setNewsSpiderPoolInfo(cacheThreadPool.toString());
-		if (Queue.proxyQueue.size() > 10 && executeQueue.size() < 6) {
+		if (proxyPool.size() > 10 && executeQueue.size() < 6) {
 			try {
 				offerSpiderToQueue();
 			} catch (InstantiationException e) {
@@ -116,7 +120,14 @@ public class NewsSpiderDispatcher implements Runnable {
 		if (executeQueue.size() > 0) {
 			AbstractNewsSpider newsSpider = executeQueue.poll();
 			log.info("Executing " + newsSpider);
-			cacheThreadPool.execute(newsSpider);
+			try {
+				List<NewsDO> newsList = cacheThreadPool.submit(newsSpider).get();
+				if (newsList != null && newsList.size() > 0) {
+					
+				}
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}

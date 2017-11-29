@@ -23,27 +23,31 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.NewsDO;
+import cn.john.hub.util.HeaderUtil;
 import cn.john.hub.util.HttpClient;
+import cn.john.hub.util.HttpClientFactory;
+import cn.john.hub.util.SiteEnum;
 
 /**
-
+ * 
  * @ClassName: CnBetaSpiderTest
-
+ * 
  * @Description: TODO
-
+ * 
  * @author: John
-
+ * 
  * @date: 2017年8月2日 下午6:24:52
-
-
+ * 
+ * 
  */
 public class CnBetaSpiderTest {
 	public static void main(String[] args) {
-		HttpClient httpClient = new HttpClient();
-		Document doc = Jsoup.parse(httpClient.getData("http://www.cnbeta.com/category/tech.htm"));
+		HttpClient httpClient = HttpClientFactory.createUsingLocalIP("http://www.cnbeta.com/category/tech.htm",
+				HeaderUtil.getBrowserLikeHeaders());
+		Document doc = Jsoup.parse(httpClient.getData());
 		Elements items = doc.getElementsByClass("items-area").get(0).children();
 		Iterator<Element> it = items.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			Element e = it.next();
 			NewsDO news = new NewsDO();
 			Element aTag = e.getElementsByTag("dt").get(0).child(0);

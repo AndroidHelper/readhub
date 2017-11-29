@@ -18,8 +18,8 @@ package cn.john.hub.spider.proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -46,10 +46,6 @@ public class XiCiProxySpider extends AbstractProxySpider{
 
 	public static final int spiderNumber = 0;
 		
-	public XiCiProxySpider(AtomicBoolean crawlingFlag){
-		super.crawlingFlag = crawlingFlag;
-	}
-	
 	/*
 	 * (non Javadoc)
 	 * 
@@ -61,7 +57,7 @@ public class XiCiProxySpider extends AbstractProxySpider{
 	 * 
 	 */
 	@Override
-	protected void parseHtml(String html) {
+	protected List<Proxy> parseHtml(String html) {
 		log.info("Start parsing proxy html...");
 		try {
 			Document doc = Jsoup.parse(html);
@@ -87,22 +83,23 @@ public class XiCiProxySpider extends AbstractProxySpider{
 					list.add(map);
 				}
 			}
-
+			
 			Iterator<HashMap<Integer, Object>> it = list.iterator();
-
+			List<Proxy> proxyList = new LinkedList<Proxy>();
 			while (it.hasNext()) {
 				HashMap<Integer, Object> map = it.next();
 				Proxy proxy = new Proxy();
 				proxy.setIpAddr((String) map.get(2));
 				proxy.setPort((String) map.get(3));
-				dataList.add(proxy);
+				proxyList.add(proxy);
 			}
+			log.info("parse xici proxy html completed!");
+			return proxyList;
 		} catch (Exception e) {
-			log.error(e.getMessage());
-			log.error("Parse xici proxy html failed!");
+			log.error("Parse xici proxy html failed!",e);
+			return null;
 		}
 		
-		log.info("parse proxy html completed!");
 	}
 
 	@Override

@@ -15,7 +15,11 @@
  */
 package cn.john.hub.util;
 
-import cn.john.hub.domain.Proxy;
+import java.util.List;
+
+import org.apache.http.Header;
+
+import cn.john.hub.spider.ProxyPool;
 
 /**
  * 
@@ -31,16 +35,15 @@ import cn.john.hub.domain.Proxy;
  */
 public class HttpClientFactory {
 
-	public static final HttpClient createLocalBrowserLikeClient() {
-		return new HttpClient();
+	private static ProxyPool proxyPool;
+
+	public static final HttpClient createUsingLocalIP(String url, List<Header> headers) {
+		return new HttpClient(url, headers, true, null);
 	}
 
-	public static final HttpClient createProxyBrowserLikeClient(Proxy proxy) {
-		return new HttpClient(proxy);
+	public static final HttpClient createUsingProxy(String url, List<Header> headers) {
+		proxyPool = ProxyPool.getInstance();
+		return new HttpClient(url, headers, true, proxyPool.get());
 	}
-
-	public static final HttpClient2 createLocalNaiveClient() {
-		return new HttpClient2();
-	}
-
+	
 }

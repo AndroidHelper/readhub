@@ -14,16 +14,15 @@
  */
 package cn.john.hub.spider;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.http.Header;
 
 import cn.john.hub.domain.NewsDO;
-import cn.john.hub.domain.Proxy;
+import cn.john.hub.domain.ParseException;
+import cn.john.hub.util.HeaderUtil;
 import cn.john.hub.util.HttpClient;
+import cn.john.hub.util.HttpClientFactory;
 
 /**
  * 
@@ -38,38 +37,18 @@ import cn.john.hub.util.HttpClient;
  * 
  */
 public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
-	
-	private static LinkedBlockingQueue<List<NewsDO>> newsQueue;
 
 	public AbstractNewsSpider() {
-		newsQueue = Queue.newsQueue;
 	}
 
 	@Override
-	public void run() {
-		super.run();
+	public List<NewsDO> call() throws ParseException {
+		return super.call();
 	}
 
-	protected void putDataToQueue() {
-		try {
-			List<NewsDO> newsList = new ArrayList<NewsDO>(dataList);
-			newsQueue.put(newsList);
-			dataList.clear();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	protected void initHttpClient() {
-		Proxy proxy = null;
-		try {
-			proxy = proxyQueue.take();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		httpClient = new HttpClient(proxy);
-
+	protected HttpClient getHttpClient(String site) {
+		List<Header> headers = HeaderUtil.getBrowserLikeHeaders();
+		return HttpClientFactory.createUsingProxy(site, headers);
 	}
 
 	// 用于调度

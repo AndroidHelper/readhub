@@ -23,7 +23,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.NewsDO;
+import cn.john.hub.util.HeaderUtil;
 import cn.john.hub.util.HttpClient;
+import cn.john.hub.util.HttpClientFactory;
 
 /**
 
@@ -39,8 +41,9 @@ import cn.john.hub.util.HttpClient;
  */
 public class TaiMediaSpiderTest {
 	public static void main(String[] args) {
-		HttpClient httpClient = new HttpClient();
-		Document doc = Jsoup.parse(httpClient.getData("http://www.tmtpost.com/column/2581216"),"http://www.tmtpost.com/column/2581216");
+		HttpClient httpClient = HttpClientFactory.createUsingLocalIP("http://www.tmtpost.com/column/2581216",
+				HeaderUtil.getBrowserLikeHeaders());
+		Document doc = Jsoup.parse(httpClient.getData(),"http://www.tmtpost.com/column/2581216");
 		Elements lis = doc.getElementsByClass("mod-article-list clear").get(0).child(0).children();
 		Iterator<Element> it = lis.iterator();
 		while(it.hasNext()){

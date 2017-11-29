@@ -16,6 +16,8 @@
 package cn.john.hub.spider.news;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,7 +40,7 @@ import cn.john.hub.util.SiteEnum;
  * 
  * 
  */
-public class TechWebSpider extends AbstractNewsSpider{
+public class TechWebSpider extends AbstractNewsSpider {
 
 	private static final int serialNumber = 0;
 
@@ -59,12 +61,13 @@ public class TechWebSpider extends AbstractNewsSpider{
 	 * 
 	 */
 	@Override
-	protected void parseHtml(String html) {
+	protected List<NewsDO> parseHtml(String html) {
 		log.info("Parsing techweb news...");
 		try {
 			Document doc = Jsoup.parse(html);
 			Elements news = doc.getElementsByClass("con_list");
 			Elements news1 = news.last().getElementsByClass("con_one");
+			List<NewsDO> newsList = new LinkedList<NewsDO>();
 			Iterator<Element> it = news1.iterator();
 			while (it.hasNext()) {
 				Element e = it.next();
@@ -80,13 +83,14 @@ public class TechWebSpider extends AbstractNewsSpider{
 				newsDO.setBrief(brief);
 				newsDO.setSiteId(1);
 
-				dataList.add(newsDO);
+				newsList.add(newsDO);
 			}
+			log.info("Parse completed!size is " + newsList.size());
+			return newsList;
 		} catch (Exception e) {
-			log.error(e.getMessage());
-			log.error("Parse techweb html failed!");
+			log.error("Parse techweb html failed!", e);
+			return null;
 		}
-		log.info("Parse completed!size is " + dataList.size());
 	}
 
 	@Override

@@ -14,18 +14,13 @@
  */
 package cn.john.hub.spider;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import cn.john.hub.domain.HttpClientException;
 import cn.john.hub.domain.ParseException;
-import cn.john.hub.domain.Proxy;
-import cn.john.hub.domain.Spider;
 import cn.john.hub.util.HttpClient;
 
 /**
@@ -45,34 +40,18 @@ public abstract class AbstractSpider<T> implements Callable<List<T>> {
 
 	protected static final Logger log = LogManager.getLogger("spider");
 
-	protected LinkedBlockingQueue<Proxy> proxyQueue = Queue.proxyQueue;
-
 	protected AbstractSpider() {
 	}
 
 	protected String getHtml(String site) {
-
-		HttpClient httpClient = initHttpClient();
 		String html = null;
 		while (html == null) {
-			httpClient = initHttpClient();
-			log.info("httpClient initialized!Proxy queue size is " + proxyQueue.size());
-			html = httpClient.getData(site);
-		}
-
-		Proxy proxy = httpClient.getProxy();
-		// 有可能是本机ip
-		if (proxy != null) {
-			try {
-				proxyQueue.put(proxy);
-			} catch (InterruptedException e) {
-				log.error(e.getMessage());
-			}
+			html = getHttpClient(site).getData();
 		}
 		return html;
 	}
 
-	protected abstract HttpClient initHttpClient();
+	protected abstract HttpClient getHttpClient(String site);
 
 	protected abstract String site();
 

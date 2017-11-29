@@ -16,6 +16,8 @@
 package cn.john.hub.spider.news;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,25 +28,25 @@ import cn.john.hub.domain.NewsDO;
 import cn.john.hub.spider.AbstractNewsSpider;
 
 /**
-
+ * 
  * @ClassName: CnBetaSpider
-
+ * 
  * @Description: TODO
-
+ * 
  * @author: John
-
+ * 
  * @date: 2017年8月2日 下午6:11:11
-
-
+ * 
+ * 
  */
-public class CnBetaSpider extends AbstractNewsSpider{
-	
+public class CnBetaSpider extends AbstractNewsSpider {
+
 	private static final int serialNumber = 1;
 
 	private static final int delayFactor = 10;
 
 	private static final String site = "http://www.cnbeta.com/category/tech.htm";
-	
+
 	/* (non Javadoc)
 	
 	 * @Title: getDelayFactor
@@ -95,9 +97,7 @@ public class CnBetaSpider extends AbstractNewsSpider{
 		// TODO Auto-generated method stub
 		return site;
 	}
-	
-	
-	
+
 	@Override
 	public String toString() {
 		return "CnBetaSpider";
@@ -115,13 +115,14 @@ public class CnBetaSpider extends AbstractNewsSpider{
 	
 	 */
 	@Override
-	protected void parseHtml(String html) {
+	protected List<NewsDO> parseHtml(String html) {
 		log.info("Parsing cnbeta html...");
 		try {
 			Document doc = Jsoup.parse(html);
 			Elements items = doc.getElementsByClass("items-area").get(0).children();
+			List<NewsDO> newsList = new LinkedList<NewsDO>();
 			Iterator<Element> it = items.iterator();
-			while(it.hasNext()){
+			while (it.hasNext()) {
 				Element e = it.next();
 				NewsDO news = new NewsDO();
 				Element aTag = e.getElementsByTag("dt").get(0).child(0);
@@ -130,13 +131,14 @@ public class CnBetaSpider extends AbstractNewsSpider{
 				Element brief = e.getElementsByTag("dd").get(0);
 				news.setBrief(brief.text());
 				news.setSiteId(2);
-				
-				dataList.add(news);
+
+				newsList.add(news);
 			}
+			log.info("Parse cnbeta news completed!size is " + newsList.size());
+			return newsList;
 		} catch (Exception e) {
-			log.error(e.getMessage());
-			log.error("Parse cnbeta html failed!");
+			log.error("Parse cnbeta html failed!", e);
+			return null;
 		}
-		log.info("Parse cnbeta news completed!size is " + dataList.size());
 	}
 }

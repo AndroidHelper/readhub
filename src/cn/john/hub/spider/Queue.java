@@ -36,7 +36,6 @@ import cn.john.hub.domain.Proxy;
  * 
  */
 public class Queue {
-	public static LinkedBlockingQueue<Proxy> proxyQueue = new LinkedBlockingQueue<Proxy>();
 	public static LinkedBlockingQueue<List<NewsDO>> newsQueue = new LinkedBlockingQueue<List<NewsDO>>();
 	public static ConcurrentLinkedQueue<AccRcdDO> accQueue = new ConcurrentLinkedQueue<AccRcdDO>();
 }

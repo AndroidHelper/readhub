@@ -16,17 +16,17 @@
 package cn.john.hub.spider;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cn.john.hub.domain.Heartbeat;
+import cn.john.hub.domain.Proxy;
 import cn.john.hub.spider.proxy.DoubleSixProxySpider;
 import cn.john.hub.spider.proxy.XiCiProxySpider;
 
@@ -46,25 +46,24 @@ import cn.john.hub.spider.proxy.XiCiProxySpider;
 public class ProxySpiderDispatcher implements Runnable {
 
 	private static Logger log = LogManager.getLogger("spider");
+	
 	private ExecutorService cacheThreadPool;
 	private HashMap<Integer, AbstractProxySpider> proxyMap;
-	private AtomicBoolean crawlingFlag;
 
-	@Autowired
-	private Heartbeat hb;
+	private ProxyPool proxyPool;
 
 	public ProxySpiderDispatcher() {
 		cacheThreadPool = Executors.newCachedThreadPool();
-		crawlingFlag = new AtomicBoolean(false);
 		proxyMap = new HashMap<Integer, AbstractProxySpider>();
+		proxyPool = ProxyPool.getInstance();
 		init();
 	}
 
 	// 注册已有的代理爬虫以供选择
 	private void init() {
 
-		XiCiProxySpider xcps = new XiCiProxySpider(crawlingFlag);
-		DoubleSixProxySpider dsps = new DoubleSixProxySpider(crawlingFlag);
+		XiCiProxySpider xcps = new XiCiProxySpider();
+		DoubleSixProxySpider dsps = new DoubleSixProxySpider();
 
 		proxyMap.put(XiCiProxySpider.spiderNumber, xcps);
 		proxyMap.put(DoubleSixProxySpider.spiderNumber, dsps);
@@ -84,23 +83,12 @@ public class ProxySpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		
-		long timestamp = System.currentTimeMillis();
-		hb.setProxySpiderBeat(timestamp);
-		hb.setProxySpiderPoolInfo(cacheThreadPool.toString());
-		synchronized (crawlingFlag) {
-			if (isLackOfProxy()) {
-				startProxySpider();
-			}
-		}
-	}
 
-	private boolean isLackOfProxy() {
-		if (Queue.proxyQueue.size() < 20) {
-			log.warn("lack of proxy!");
-			return true;
+		while (proxyPool.size() < 20) {
+			startProxySpider();
 		}
-		return false;
+
+		proxyPool.signalSufficient();
 	}
 
 	// 启动代理爬虫
@@ -114,14 +102,15 @@ public class ProxySpiderDispatcher implements Runnable {
 		}
 		AbstractProxySpider proxySpider = proxyMap.get(randKey);
 		log.info("Proxy spider get!Detail: " + proxySpider);
-		// 启动
-		cacheThreadPool.execute(proxySpider);
+
 		try {
-			log.info("A proxy spider has been launched! Waiting for it to finish crawling...");
-			crawlingFlag.wait();
-			log.info("proxy spider has done it's work!");
-		} catch (InterruptedException e) {
-			log.error(e.getMessage());
+			List<Proxy> proxyList = cacheThreadPool.submit(proxySpider).get();
+			if (proxyList != null && proxyList.size() > 0) {
+				proxyPool.putAll(proxyList);
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			log.error("Error getting proxy...", e);
 		}
+
 	}
 }

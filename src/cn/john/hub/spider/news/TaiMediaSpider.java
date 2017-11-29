@@ -16,6 +16,8 @@
 package cn.john.hub.spider.news;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,25 +28,25 @@ import cn.john.hub.domain.NewsDO;
 import cn.john.hub.spider.AbstractNewsSpider;
 
 /**
-
+ * 
  * @ClassName: TaiMediaSpider
-
+ * 
  * @Description: TODO
-
+ * 
  * @author: John
-
+ * 
  * @date: 2017年8月2日 下午6:51:03
-
-
+ * 
+ * 
  */
-public class TaiMediaSpider extends AbstractNewsSpider{
-	
+public class TaiMediaSpider extends AbstractNewsSpider {
+
 	private static final int serialNumber = 2;
 
 	private static final int delayFactor = 15;
 
 	private static final String site = "http://www.tmtpost.com/column/2581216";
-	
+
 	/* (non Javadoc)
 	
 	 * @Title: getDelayFactor
@@ -96,9 +98,6 @@ public class TaiMediaSpider extends AbstractNewsSpider{
 		return site;
 	}
 
-	
-	
-	
 	@Override
 	public String toString() {
 		return "TaiMediaSpider";
@@ -116,13 +115,14 @@ public class TaiMediaSpider extends AbstractNewsSpider{
 	
 	 */
 	@Override
-	protected void parseHtml(String html) {
+	protected List<NewsDO> parseHtml(String html) {
 		log.info("Parsing taimedia news...");
 		try {
-			Document doc = Jsoup.parse(html,site);
+			Document doc = Jsoup.parse(html, site);
 			Elements lis = doc.getElementsByClass("mod-article-list clear").get(0).child(0).children();
+			List<NewsDO> newsList = new LinkedList<NewsDO>();
 			Iterator<Element> it = lis.iterator();
-			while(it.hasNext()){
+			while (it.hasNext()) {
 				Element e = it.next();
 				NewsDO news = new NewsDO();
 				Element aTag = e.getElementsByTag("h3").get(0).child(0);
@@ -133,13 +133,14 @@ public class TaiMediaSpider extends AbstractNewsSpider{
 				news.setUrl(url);
 				news.setTitle(title);
 				news.setSiteId(3);
-				dataList.add(news);
+				newsList.add(news);
 			}
+			log.info("Parsing taimedia news completed!");
+			return newsList;
 		} catch (Exception e) {
-			log.error(e.getMessage());
-			log.error("Parse taimedia html failed!");
+			log.error("Parse taimedia html failed!", e);
+			return null;
 		}
-		log.info("Parsing taimedia news completed!");
 	}
 
 }
