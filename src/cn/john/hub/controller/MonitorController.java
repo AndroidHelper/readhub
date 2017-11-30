@@ -15,6 +15,9 @@
  */
 package cn.john.hub.controller;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
@@ -64,7 +67,7 @@ public class MonitorController {
 		map.put("nsp", hb.getNewsSpiderPoolInfo());
 		map.put("psp", hb.getProxySpiderPoolInfo());
 		map.put("lsnc", hb.getLastSavedNewsCount());
-		
+
 		long now = System.currentTimeMillis();
 
 		if ((now - hb.getNewsSpiderBeat()) / 1000 > 60) {
@@ -83,5 +86,36 @@ public class MonitorController {
 			map.put("ip", "Running");
 		}
 		return map;
+	}
+
+	@RequestMapping("/checkClasses")
+	@ResponseBody
+	public String chekcClasses() {
+		ClassLoader loader = this.getClass().getClassLoader();
+		String thisFolder = this.getClass().getResource("").getFile();
+		String newsFolder = thisFolder.replaceAll("controller", "spider")+"news/";
+		File dir = new File(newsFolder.substring(1, newsFolder.length()));
+		for(File f:dir.listFiles()){
+			try {
+				Class<?> clazz = loader.loadClass("cn.john.hub.spider.news.Test");
+				Method[] method = clazz.getMethods();
+				for(Method m:method){
+					System.out.println(m.getName());
+				}
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	public static void main(String[] args) {
+		String thisFolder = MonitorController.class.getResource("").getFile();
+		String newsFolder = thisFolder.replaceAll("controller", "spider")+"news/";
+		File dir = new File(newsFolder.substring(1, newsFolder.length()));
+		for(File f:dir.listFiles()){
+			
+		}
 	}
 }

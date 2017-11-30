@@ -46,13 +46,12 @@ public class SpiderDispatcher {
 	@Autowired
 	private NewsSpiderDispatcher nsd;
 
-	@PostConstruct
+	//@PostConstruct
 	private void startDeamon() {
 
 		ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(3);
 		// 负责爬取新闻信息
 		stpe.scheduleWithFixedDelay(nsd, 5, 5, TimeUnit.SECONDS);
 
-		log.info("Spider controller is constructed!proxy spider,news spider and news saver are started!");
 	}
 }
