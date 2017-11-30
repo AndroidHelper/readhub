@@ -44,7 +44,7 @@ import cn.john.hub.util.HubConsts;
  */
 public class XiCiProxySpider extends AbstractProxySpider{
 
-	public static final int spiderNumber = 0;
+	public static final int proxySpiderId = 0;
 		
 	/*
 	 * (non Javadoc)
@@ -58,7 +58,7 @@ public class XiCiProxySpider extends AbstractProxySpider{
 	 */
 	@Override
 	protected List<Proxy> parseHtml(String html) {
-		log.info("Start parsing proxy html...");
+		log.info("Start parsing xici html...");
 		try {
 			Document doc = Jsoup.parse(html);
 			Element news = doc.getElementById("ip_list");
@@ -91,6 +91,7 @@ public class XiCiProxySpider extends AbstractProxySpider{
 				Proxy proxy = new Proxy();
 				proxy.setIpAddr((String) map.get(2));
 				proxy.setPort((String) map.get(3));
+				proxy.setProxySpiderId(proxySpiderId);
 				proxyList.add(proxy);
 			}
 			log.info("parse xici proxy html completed!");
@@ -104,7 +105,7 @@ public class XiCiProxySpider extends AbstractProxySpider{
 
 	@Override
 	public String toString() {
-		return "XiCiProxySpider";
+		return "0----XiCiProxySpider";
 	}
 
 	/* (non Javadoc)
@@ -122,6 +123,23 @@ public class XiCiProxySpider extends AbstractProxySpider{
 	protected String site() {
 		// TODO Auto-generated method stub
 		return HubConsts.PROXY_XICI;
+	}
+
+	/* (non Javadoc)
+	
+	 * @Title: getPossiblity
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractProxySpider#getPossiblity()
+	
+	 */
+	@Override
+	public int getPossiblity() {
+		// TODO Auto-generated method stub
+		return 25;
 	}
 
 }

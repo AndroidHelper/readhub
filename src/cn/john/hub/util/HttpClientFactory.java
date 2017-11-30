@@ -36,16 +36,15 @@ import cn.john.hub.spider.ProxyPool;
  */
 public class HttpClientFactory {
 
-	private static ProxyPool proxyPool;
-
 	public static final HttpClient createUsingLocalIP(String url, List<Header> headers) {
-		return new HttpClient(url, headers, true, null);
+		return new HttpClient(url, headers, HubConsts.GET, null);
 	}
 
-	public static final HttpClient createUsingProxy(String url, List<Header> headers, boolean unInterrupt) {
-		proxyPool = ProxyPool.getInstance();
-		Proxy proxy = unInterrupt ? proxyPool.getUnwait() : proxyPool.get();
-		return new HttpClient(url, headers, true, proxy);
+	public static final HttpClient createUsingProxy(String url, List<Header> headers, ProxyPool proxyPool,
+			boolean waitWhenNotEnough) {
+		Proxy proxy = waitWhenNotEnough ? proxyPool.get() : proxyPool.poll();
+		LogUtil.getSpiderLogger().info("creating httpClient...pool size is " + proxyPool.size());
+		return new HttpClient(url, headers, HubConsts.GET, proxy);
 	}
 
 }

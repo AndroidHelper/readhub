@@ -70,6 +70,7 @@ public class NewsSpiderDispatcher implements Runnable {
 		spiderList = new ArrayList<NewsSpiderWithTime>();
 		executeQueue = new LinkedList<AbstractNewsSpider>();
 		rand = new Random();
+		//先初始化代理Ip池
 		proxyPool = ProxyPool.getInstance();
 		init();
 	}
@@ -106,12 +107,11 @@ public class NewsSpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-		System.out.println(">>>>>>>>>>>>>");
 		long timestamp = System.currentTimeMillis();
 		hb.setNewsSpiderBeat(timestamp);
 		hb.setNewsSpiderExeQueueInfo(executeQueue.toString());
 		hb.setNewsSpiderPoolInfo(cacheThreadPool.toString());
-		if (proxyPool.size() > 10 && executeQueue.size() < 6) {
+		if ( executeQueue.size() < 6) {
 			try {
 				offerSpiderToQueue();
 			} catch (InstantiationException e) {
@@ -124,7 +124,6 @@ public class NewsSpiderDispatcher implements Runnable {
 			AbstractNewsSpider newsSpider = executeQueue.poll();
 			log.info("Executing " + newsSpider);
 			try {
-				
 				List<NewsDO> newsList = cacheThreadPool.submit(newsSpider).get();
 				if (newsList != null && newsList.size() > 0) {
 					nService.saveNews(newsList);

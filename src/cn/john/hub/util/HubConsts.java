@@ -44,5 +44,6 @@ public class HubConsts {
 	public static final String AUTHORIZATION = "APPCODE db88c41adc774aefabd86d79ecea3224";
 	public static final String IP_API = "http://iploc.market.alicloudapi.com/v3/ip?ip=";
 	
-	
+	public static final String GET = "GET";
+	public static final String POST = "POST";
 }

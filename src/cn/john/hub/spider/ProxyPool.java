@@ -16,10 +16,15 @@
 package cn.john.hub.spider;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.annotation.PostConstruct;
 
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.util.LogUtil;
@@ -39,14 +44,28 @@ import cn.john.hub.util.LogUtil;
 public class ProxyPool {
 
 	private static volatile ProxyPool proxyPool;
-	private LinkedBlockingQueue<Proxy> pool;
+
+	private LinkedBlockingDeque<Proxy> pool = new LinkedBlockingDeque<Proxy>();
 	private ReentrantLock lock = new ReentrantLock();
-	private Condition lackCondition = lock.newCondition();
+	private Condition notEnough = lock.newCondition();
+	private ExecutorService ste = Executors.newSingleThreadExecutor();
+	private ProxySpiderDispatcher psd = new ProxySpiderDispatcher();
 
 	private ProxyPool() {
-		pool = new LinkedBlockingQueue<Proxy>();
+		init();
 	}
 
+	/**
+	 * 
+	 * @Title: getInstance
+	 * 
+	 * @Description: 可以将ProxyPool交给spring管理，这里学习下双重检查锁定创建单例
+	 * 
+	 * @return
+	 * 
+	 * @return: ProxyPool
+	 * 
+	 */
 	public static ProxyPool getInstance() {
 		if (proxyPool == null) {
 			synchronized (ProxyPool.class) {
@@ -56,6 +75,11 @@ public class ProxyPool {
 			}
 		}
 		return proxyPool;
+	}
+
+	private void init() {
+		LogUtil.getSpiderLogger().info("Pool initiation...Lack of proxy!Triggering proxy spider...");
+		ste.submit(psd);
 	}
 
 	/**
@@ -69,50 +93,62 @@ public class ProxyPool {
 	 * @return: void
 	 * 
 	 */
-	public void offer(Proxy proxy) {
-		pool.offer(proxy);
+	public void offerFirst(Proxy proxy) {
+		pool.offerFirst(proxy);
 	}
 
 	public void putAll(List<Proxy> proxyList) {
 		pool.addAll(proxyList);
 	}
 
+	public Proxy poll() {
+		return pool.poll();
+	}
+
+	public Proxy peek() {
+		return pool.peek();
+	}
+
 	/**
 	 * 
-	 * @Title: get
+	 * @Title: getAndWaitAt
 	 * 
-	 * @Description: 从代理池获取代理,如果池为空则等待直到有代理可用
+	 * @Description: 当代理数量少于size时等待
 	 * 
+	 * @param size
 	 * @return
 	 * 
 	 * @return: Proxy
 	 * 
 	 */
 	public Proxy get() {
+		if (pool.size() > 30) {
+			return pool.poll();
+		}
 		lock.lock();
 		try {
 			if (pool.size() < 20) {
-				lackCondition.awaitUninterruptibly();
+				LogUtil.getSpiderLogger()
+						.info("Pool size is " + pool.size() + " Lack of proxy!Triggering proxy spider and wait!");
+				ste.submit(psd);
+				notEnough.awaitUninterruptibly();
+				LogUtil.getSpiderLogger().info("Pool size is " + pool.size() + " Unpark and carry on!");
 			}
 		} finally {
 			lock.unlock();
 		}
 		return pool.poll();
 	}
-	
-	
-	public Proxy getUnwait(){
-		return pool.poll();
-	}
-	
+
 	public int size() {
 		return pool.size();
 	}
 
-	public void signalSufficient() {
+	public void signalEnough() {
 		lock.lock();
 		try {
-			lackCondition.signalAll();
+			LogUtil.getSpiderLogger().info("Signal proxy enough!And " + "pool size is " + pool.size());
+			notEnough.signalAll();
 		} finally {
 			lock.unlock();
 		}

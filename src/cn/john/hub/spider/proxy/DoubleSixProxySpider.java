@@ -42,7 +42,7 @@ import cn.john.hub.spider.AbstractProxySpider;
  */
 public class DoubleSixProxySpider extends AbstractProxySpider {
 
-	public static final int spiderNumber = 1;
+	public static final int proxySpiderId = 1;
 
 	private Random rand = new Random();
 
@@ -60,7 +60,7 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 	 */
 	@Override
 	protected List<Proxy> parseHtml(String html) {
-		log.info("Parsing proxy html...");
+		log.info("Parsing 66ip html...");
 		try {
 			Document doc = Jsoup.parse(html);
 			Element table = doc.getElementsByTag("table").get(2);
@@ -74,9 +74,10 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 				Elements tdList = tr.getElementsByTag("td");
 				proxy.setIpAddr(tdList.get(0).text());
 				proxy.setPort(tdList.get(1).text());
+				proxy.setProxySpiderId(proxySpiderId);
 				proxyList.add(proxy);
 			}
-			log.info("parse proxy html completed!");
+			log.info("parse 66ip html completed!");
 			return proxyList;
 		} catch (Exception e) {
 			log.error("Parse 66ip html failed!", e);
@@ -104,6 +105,23 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 
 	@Override
 	public String toString() {
-		return "DoubleSixProxySpider";
+		return "1----DoubleSixProxySpider";
+	}
+
+	/* (non Javadoc)
+	
+	 * @Title: getPossiblity
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractProxySpider#getPossiblity()
+	
+	 */
+	@Override
+	public int getPossiblity() {
+		// TODO Auto-generated method stub
+		return 50;
 	}
 }

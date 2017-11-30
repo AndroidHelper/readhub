@@ -42,7 +42,7 @@ import cn.john.hub.spider.AbstractProxySpider;
  */
 public class IPOneEightOneProxySpider extends AbstractProxySpider {
 
-	public static final int spiderNumber = 2;
+	public static final int proxySpiderId = 2;
 
 	/*
 	 * (non Javadoc)
@@ -80,7 +80,7 @@ public class IPOneEightOneProxySpider extends AbstractProxySpider {
 	 */
 	@Override
 	protected List<Proxy> parseHtml(String html) throws ParseException {
-		log.info("Parsing proxy html...");
+		log.info("Parsing ip181 html...");
 		try {
 			Document doc = Jsoup.parse(html);
 			Element table = doc.getElementsByTag("tbody").get(0);
@@ -92,16 +92,19 @@ public class IPOneEightOneProxySpider extends AbstractProxySpider {
 				Proxy proxy = new Proxy();
 				Element tr = it.next();
 				Elements tdList = tr.getElementsByTag("td");
-				if(!tdList.get(2).text().trim().equals("透明")){
+				// 该网站只能返回GBK编码，httpClient
+				// ResponseHandler目前设置为UTF-8的解码，不好修改。改在这里用 ‘͸��’表示“透明”
+				if (!tdList.get(2).text().trim().equals("͸��")) {
 					proxy.setIpAddr(tdList.get(0).text());
-					proxy.setPort(tdList.get(1).text());					
+					proxy.setPort(tdList.get(1).text());
+					proxy.setProxySpiderId(proxySpiderId);
 					proxyList.add(proxy);
 				}
 			}
-			log.info("parse proxy html completed!");
+			log.info("parse ip181 html completed!");
 			return proxyList;
 		} catch (Exception e) {
-			log.error("Parse 66ip html failed!", e);
+			log.error("Parse ip181 html failed!", e);
 			return null;
 		}
 	}
@@ -120,7 +123,24 @@ public class IPOneEightOneProxySpider extends AbstractProxySpider {
 	 */
 	@Override
 	public String toString() {
-		return "IPOneEightOneProxySpider";
+		return "2----IPOneEightOneProxySpider";
+	}
+
+	/* (non Javadoc)
+	
+	 * @Title: getPossiblity
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractProxySpider#getPossiblity()
+	
+	 */
+	@Override
+	public int getPossiblity() {
+		// TODO Auto-generated method stub
+		return 25;
 	}
 
 }

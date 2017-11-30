@@ -42,20 +42,16 @@ import org.springframework.stereotype.Component;
 public class SpiderDispatcher {
 	private static Logger log = LogManager.getLogger("spider");
 	public static ExecutorService cacheThreadPool = Executors.newCachedThreadPool();
-	
+
 	@Autowired
 	private NewsSpiderDispatcher nsd;
-	@Autowired
-	private ProxySpiderDispatcher psd;
 
 	@PostConstruct
 	private void startDeamon() {
-		
+
 		ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(3);
-		// 负责维护代理ip
-		stpe.scheduleWithFixedDelay(psd, 0, 10, TimeUnit.SECONDS);
 		// 负责爬取新闻信息
-		stpe.scheduleWithFixedDelay(nsd, 30, 10, TimeUnit.SECONDS);
+		stpe.scheduleWithFixedDelay(nsd, 5, 5, TimeUnit.SECONDS);
 
 		log.info("Spider controller is constructed!proxy spider,news spider and news saver are started!");
 	}

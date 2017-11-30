@@ -38,10 +38,7 @@ import cn.john.hub.util.HttpClientFactory;
  */
 public abstract class AbstractProxySpider extends AbstractSpider<Proxy> {
 
-	private ProxyPool proxyPool;
-
 	protected AbstractProxySpider() {
-		proxyPool = ProxyPool.getInstance();
 	}
 
 	@Override
@@ -49,14 +46,12 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy> {
 		return super.call();
 	}
 
-	protected HttpClient getHttpClient(String site) {
+	protected HttpClient fetchNewHttpClient(String site) {
+		ProxyPool pool = fetchProxyPool();
 		List<Header> headers = HeaderUtil.getBrowserLikeHeaders();
-		if (proxyPool.size() > 0) {
-			log.info("Fetching proxys using proxy ip...");
-			return HttpClientFactory.createUsingProxy(site, headers,true);
-		}
-		log.info("Fetching proxys using local ip address...");
-		return HttpClientFactory.createUsingLocalIP(site, headers);
+		return HttpClientFactory.createUsingProxy(site, headers, pool, false);
 	}
+
+	public abstract int getPossiblity();
 
 }

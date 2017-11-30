@@ -46,9 +46,10 @@ public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 		return super.call();
 	}
 
-	protected HttpClient getHttpClient(String site) {
+	protected HttpClient fetchNewHttpClient(String site) {
+		ProxyPool pool = fetchProxyPool();
 		List<Header> headers = HeaderUtil.getBrowserLikeHeaders();
-		return HttpClientFactory.createUsingProxy(site, headers,false);
+		return HttpClientFactory.createUsingProxy(site, headers, pool,true);
 	}
 
 	// 用于调度

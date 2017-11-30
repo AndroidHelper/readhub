@@ -52,11 +52,11 @@ public class HttpClient {
 
 	private HttpRequestBase httpResq;
 
-	public HttpClient(String url, List<Header> headers, boolean get) {
-		this(url, headers, get, null);
+	public HttpClient(String url, List<Header> headers, String method) {
+		this(url, headers, method, null);
 	}
 
-	public HttpClient(String url, List<Header> headers, boolean get, Proxy proxy) {
+	public HttpClient(String url, List<Header> headers, String method, Proxy proxy) {
 
 		builder = HttpClients.custom();
 
@@ -76,29 +76,37 @@ public class HttpClient {
 		};
 
 		if (proxy != null) {
+			log.info("Building httpClient using proxy: " + proxy);
 			this.proxy = proxy;
 			HttpHost proxyHost = new HttpHost(proxy.getIpAddr(), Integer.parseInt(proxy.getPort()));
 			DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
 			httpClient = builder.setDefaultRequestConfig(defaultReqCfg).setRoutePlanner(routePlanner).build();
 		} else {
+			log.info("Building httpClient using local ip...");
 			httpClient = builder.setDefaultRequestConfig(defaultReqCfg).build();
 		}
-		
-		if (get) {
+
+		switch (method) {
+		case HubConsts.GET:
 			httpResq = new HttpGet(url);
-		} else {
+			break;
+		case HubConsts.POST:
 			httpResq = new HttpPost(url);
+			break;
+		default:
+			httpResq = new HttpGet(url);
+			break;
 		}
 
 		httpResq.setHeaders(headers.toArray(new Header[0]));
 	}
 
 	public String getData() {
-		
+
 		try {
 			return httpClient.execute(httpResq, responseHandler);
 		} catch (Exception e) {
-			log.error("HttpClient Error!",e.getMessage());
+			log.error("HttpClient Error!", e.getMessage());
 			return null;
 		} finally {
 			try {
@@ -109,30 +117,8 @@ public class HttpClient {
 		}
 	}
 	
-	public String getDataForGBK() {
-		responseHandler = new ResponseHandler<String>() {
-			public String handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
-				int status = response.getStatusLine().getStatusCode();
-				if (status >= 200 && status < 300) {
-					HttpEntity entity = response.getEntity();
-					return entity != null ? EntityUtils.toString(entity, "GBK") : null;
-				} else {
-					throw new ClientProtocolException("Unexcepted response status:" + status);
-				}
-			}
-		};
-		try {
-			return httpClient.execute(httpResq, responseHandler);
-		} catch (Exception e) {
-			log.error("HttpClient Error!",e.getMessage());
-			return null;
-		} finally {
-			try {
-				httpClient.close();
-			} catch (IOException e) {
-				log.error(e);
-			}
-		}
+	public Proxy getProxy(){
+		return proxy;
 	}
 
 }
