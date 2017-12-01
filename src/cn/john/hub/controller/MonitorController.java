@@ -113,9 +113,9 @@ public class MonitorController {
 	public static void main(String[] args) {
 		String thisFolder = MonitorController.class.getResource("").getFile();
 		String newsFolder = thisFolder.replaceAll("controller", "spider")+"news/";
-		File dir = new File(newsFolder.substring(1, newsFolder.length()));
+		File dir = new File(newsFolder);
 		for(File f:dir.listFiles()){
-			
+			System.out.println(f);
 		}
 	}
 }

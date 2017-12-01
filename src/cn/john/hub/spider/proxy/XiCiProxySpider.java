@@ -26,6 +26,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import cn.john.hub.domain.ParseException;
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.spider.AbstractProxySpider;
 import cn.john.hub.util.HubConsts;
@@ -42,10 +43,10 @@ import cn.john.hub.util.HubConsts;
  * 
  * 
  */
-public class XiCiProxySpider extends AbstractProxySpider{
+public class XiCiProxySpider extends AbstractProxySpider {
 
-	public static final int proxySpiderId = 0;
-		
+	private final int proxySpiderId = 0;
+
 	/*
 	 * (non Javadoc)
 	 * 
@@ -57,7 +58,7 @@ public class XiCiProxySpider extends AbstractProxySpider{
 	 * 
 	 */
 	@Override
-	protected List<Proxy> parseHtml(String html) {
+	protected List<Proxy> parseHtml(String html) throws ParseException{
 		log.info("Start parsing xici html...");
 		try {
 			Document doc = Jsoup.parse(html);
@@ -83,7 +84,7 @@ public class XiCiProxySpider extends AbstractProxySpider{
 					list.add(map);
 				}
 			}
-			
+
 			Iterator<HashMap<Integer, Object>> it = list.iterator();
 			List<Proxy> proxyList = new LinkedList<Proxy>();
 			while (it.hasNext()) {
@@ -97,10 +98,9 @@ public class XiCiProxySpider extends AbstractProxySpider{
 			log.info("parse xici proxy html completed!");
 			return proxyList;
 		} catch (Exception e) {
-			log.error("Parse xici proxy html failed!",e);
-			return null;
+			throw new ParseException("Parse xici proxy html failed!",e);
 		}
-		
+
 	}
 
 	@Override
@@ -120,8 +120,7 @@ public class XiCiProxySpider extends AbstractProxySpider{
 	
 	 */
 	@Override
-	protected String site() {
-		// TODO Auto-generated method stub
+	public String site() {
 		return HubConsts.PROXY_XICI;
 	}
 
@@ -139,7 +138,24 @@ public class XiCiProxySpider extends AbstractProxySpider{
 	@Override
 	public int getPossiblity() {
 		// TODO Auto-generated method stub
-		return 25;
+		return 15;
+	}
+
+	/* (non Javadoc)
+	
+	 * @Title: getProxySpiderId
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySpiderId()
+	
+	 */
+	@Override
+	public int getProxySpiderId() {
+		// TODO Auto-generated method stub
+		return proxySpiderId;
 	}
 
 }

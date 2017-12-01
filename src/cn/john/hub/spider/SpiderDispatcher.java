@@ -46,7 +46,7 @@ public class SpiderDispatcher {
 	@Autowired
 	private NewsSpiderDispatcher nsd;
 
-	//@PostConstruct
+	@PostConstruct
 	private void startDeamon() {
 
 		ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(3);

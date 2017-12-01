@@ -15,6 +15,7 @@
  */
 package cn.john.hub.spider.proxy;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +43,7 @@ import cn.john.hub.spider.AbstractProxySpider;
  */
 public class IPOneEightOneProxySpider extends AbstractProxySpider {
 
-	public static final int proxySpiderId = 2;
+	private final int proxySpiderId = 2;
 
 	/*
 	 * (non Javadoc)
@@ -57,8 +58,7 @@ public class IPOneEightOneProxySpider extends AbstractProxySpider {
 	 * 
 	 */
 	@Override
-	protected String site() {
-		// TODO Auto-generated method stub
+	public String site() {
 		return "http://www.ip181.com/";
 	}
 
@@ -104,8 +104,7 @@ public class IPOneEightOneProxySpider extends AbstractProxySpider {
 			log.info("parse ip181 html completed!");
 			return proxyList;
 		} catch (Exception e) {
-			log.error("Parse ip181 html failed!", e);
-			return null;
+			throw new ParseException("Parse ip181 html failed!", e);
 		}
 	}
 
@@ -140,7 +139,24 @@ public class IPOneEightOneProxySpider extends AbstractProxySpider {
 	@Override
 	public int getPossiblity() {
 		// TODO Auto-generated method stub
-		return 25;
+		return 15;
+	}
+
+	/* (non Javadoc)
+	
+	 * @Title: getProxySpiderId
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySpiderId()
+	
+	 */
+	@Override
+	public int getProxySpiderId() {
+		// TODO Auto-generated method stub
+		return proxySpiderId;
 	}
 
 }

@@ -25,6 +25,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.NewsDO;
+import cn.john.hub.domain.ParseException;
 import cn.john.hub.spider.AbstractNewsSpider;
 
 /**
@@ -115,7 +116,7 @@ public class CnBetaSpider extends AbstractNewsSpider {
 	
 	 */
 	@Override
-	protected List<NewsDO> parseHtml(String html) {
+	protected List<NewsDO> parseHtml(String html) throws ParseException {
 		log.info("Parsing cnbeta html...");
 		try {
 			Document doc = Jsoup.parse(html);
@@ -137,8 +138,7 @@ public class CnBetaSpider extends AbstractNewsSpider {
 			log.info("Parse cnbeta news completed!size is " + newsList.size());
 			return newsList;
 		} catch (Exception e) {
-			log.error("Parse cnbeta html failed!", e);
-			return null;
+			throw new ParseException("Parse cnbeta html failed!", e);
 		}
 	}
 }

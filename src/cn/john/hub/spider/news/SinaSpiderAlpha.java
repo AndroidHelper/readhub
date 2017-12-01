@@ -39,13 +39,13 @@ import cn.john.hub.spider.AbstractNewsSpider;
 
 
  */
-public class SinaSpider extends AbstractNewsSpider{
+public class SinaSpiderAlpha extends AbstractNewsSpider{
 	
 	private static final int serialNumber = 3;
 
 	private static final int delayFactor = 1;
 
-	private static final String site = "http://tech.sina.com.cn/internet/";
+	private static final String site = "http://tech.sina.com.cn/";
 
 	/* (non Javadoc)
 	

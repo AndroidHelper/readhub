@@ -20,6 +20,8 @@ import org.apache.http.Header;
 
 import cn.john.hub.domain.NewsDO;
 import cn.john.hub.domain.ParseException;
+import cn.john.hub.service.NewsService;
+import cn.john.hub.util.BeanUtil;
 import cn.john.hub.util.HeaderUtil;
 import cn.john.hub.util.HttpClient;
 import cn.john.hub.util.HttpClientFactory;
@@ -42,14 +44,19 @@ public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 	}
 
 	@Override
-	public List<NewsDO> call() throws ParseException {
-		return super.call();
+	public void run() {
+		super.run();
 	}
 
 	protected HttpClient fetchNewHttpClient(String site) {
 		ProxyPool pool = fetchProxyPool();
 		List<Header> headers = HeaderUtil.getBrowserLikeHeaders();
-		return HttpClientFactory.createUsingProxy(site, headers, pool,true);
+		return HttpClientFactory.createUsingProxy(site, headers, pool, true);
+	}
+
+	@Override
+	protected void consume(List<NewsDO> list) {
+		BeanUtil.getNewsServiceBean().saveNews(list);
 	}
 
 	// 用于调度

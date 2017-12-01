@@ -15,6 +15,7 @@
  */
 package cn.john.hub.spider.proxy;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import cn.john.hub.domain.ParseException;
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.spider.AbstractProxySpider;
 
@@ -42,7 +44,7 @@ import cn.john.hub.spider.AbstractProxySpider;
  */
 public class DoubleSixProxySpider extends AbstractProxySpider {
 
-	public static final int proxySpiderId = 1;
+	private final int proxySpiderId = 1;
 
 	private Random rand = new Random();
 
@@ -59,8 +61,8 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 	 * 
 	 */
 	@Override
-	protected List<Proxy> parseHtml(String html) {
-		log.info("Parsing 66ip html...");
+	protected List<Proxy> parseHtml(String html) throws ParseException {
+		log.info("Parsing  double six proxy html...");
 		try {
 			Document doc = Jsoup.parse(html);
 			Element table = doc.getElementsByTag("table").get(2);
@@ -77,30 +79,16 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 				proxy.setProxySpiderId(proxySpiderId);
 				proxyList.add(proxy);
 			}
-			log.info("parse 66ip html completed!");
+			log.info("parse  double six proxy html completed!");
 			return proxyList;
 		} catch (Exception e) {
-			log.error("Parse 66ip html failed!", e);
-			return null;
+			throw new ParseException("Parse double six proxy html failed!", e);
 		}
 	}
 
-	/*
-	 * (non Javadoc)
-	 * 
-	 * @Title: getProxySite
-	 * 
-	 * @Description: TODO
-	 * 
-	 * @return
-	 * 
-	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySite()
-	 * 
-	 */
 	@Override
-	protected String site() {
-		String site = "http://www.66ip.cn/areaindex_" + (rand.nextInt(34) + 1) + "/1.html";
-		return site;
+	public String site() {
+		return "http://www.66ip.cn/areaindex_" + (rand.nextInt(34) + 1) + "/1.html";
 	}
 
 	@Override
@@ -123,5 +111,22 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 	public int getPossiblity() {
 		// TODO Auto-generated method stub
 		return 50;
+	}
+
+	/* (non Javadoc)
+	
+	 * @Title: getProxySpiderId
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySpiderId()
+	
+	 */
+	@Override
+	public int getProxySpiderId() {
+		// TODO Auto-generated method stub
+		return proxySpiderId;
 	}
 }

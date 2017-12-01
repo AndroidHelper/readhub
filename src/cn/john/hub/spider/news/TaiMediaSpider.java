@@ -25,6 +25,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.NewsDO;
+import cn.john.hub.domain.ParseException;
 import cn.john.hub.spider.AbstractNewsSpider;
 
 /**
@@ -115,7 +116,7 @@ public class TaiMediaSpider extends AbstractNewsSpider {
 	
 	 */
 	@Override
-	protected List<NewsDO> parseHtml(String html) {
+	protected List<NewsDO> parseHtml(String html) throws ParseException {
 		log.info("Parsing taimedia news...");
 		try {
 			Document doc = Jsoup.parse(html, site);
@@ -138,8 +139,7 @@ public class TaiMediaSpider extends AbstractNewsSpider {
 			log.info("Parsing taimedia news completed!");
 			return newsList;
 		} catch (Exception e) {
-			log.error("Parse taimedia html failed!", e);
-			return null;
+			throw new ParseException("Parse taimedia html failed!", e);
 		}
 	}
 

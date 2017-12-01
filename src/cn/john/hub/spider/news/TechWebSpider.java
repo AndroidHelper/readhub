@@ -25,6 +25,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cn.john.hub.domain.NewsDO;
+import cn.john.hub.domain.ParseException;
 import cn.john.hub.spider.AbstractNewsSpider;
 import cn.john.hub.util.SiteEnum;
 
@@ -61,7 +62,7 @@ public class TechWebSpider extends AbstractNewsSpider {
 	 * 
 	 */
 	@Override
-	protected List<NewsDO> parseHtml(String html) {
+	protected List<NewsDO> parseHtml(String html) throws ParseException {
 		log.info("Parsing techweb news...");
 		try {
 			Document doc = Jsoup.parse(html);
@@ -88,8 +89,7 @@ public class TechWebSpider extends AbstractNewsSpider {
 			log.info("Parse completed!size is " + newsList.size());
 			return newsList;
 		} catch (Exception e) {
-			log.error("Parse techweb html failed!", e);
-			return null;
+			throw new ParseException("Parse techweb html failed!", e);
 		}
 	}
 

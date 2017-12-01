@@ -15,6 +15,7 @@
  */
 package cn.john.hub.spider;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.spider.proxy.DoubleSixProxySpider;
 import cn.john.hub.spider.proxy.IPOneEightOneProxySpider;
+import cn.john.hub.spider.proxy.KuaiProxySpider;
 import cn.john.hub.spider.proxy.XiCiProxySpider;
 
 /**
@@ -46,7 +48,6 @@ import cn.john.hub.spider.proxy.XiCiProxySpider;
  * 
  * 
  */
-@Component
 public class ProxySpiderDispatcher implements Runnable {
 
 	private static Logger log = LogManager.getLogger("spider");
@@ -64,13 +65,32 @@ public class ProxySpiderDispatcher implements Runnable {
 	// 注册已有的代理爬虫以供选择
 	private void init() {
 
-		XiCiProxySpider xcps = new XiCiProxySpider();
-		DoubleSixProxySpider dsps = new DoubleSixProxySpider();
-		IPOneEightOneProxySpider oeops = new IPOneEightOneProxySpider();
+		Class<? extends ProxySpiderDispatcher> clazz = this.getClass();
 
-		proxyMap.put(XiCiProxySpider.proxySpiderId, xcps);
-		proxyMap.put(DoubleSixProxySpider.proxySpiderId, dsps);
-		proxyMap.put(IPOneEightOneProxySpider.proxySpiderId, oeops);
+		ClassLoader loader = clazz.getClassLoader();
+		String classPath = clazz.getResource("").getFile();
+		String classPackage = clazz.getPackage().getName();
+
+		String proxyPackage = classPackage + ".proxy";
+		String proxyPath = classPath + "proxy/";
+
+		File classes = new File(proxyPath);
+		String className = null;
+		for (File f : classes.listFiles()) {
+			String fileName = f.getName();
+			if (fileName.contains("Alpha")) {
+				continue;
+			}
+
+			className = proxyPackage + "." + fileName.replace(".class", "");
+			try {
+				AbstractProxySpider aps = (AbstractProxySpider) loader.loadClass(className).newInstance();
+				proxyMap.put(aps.getProxySpiderId(), aps);
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		log.info("proxy map initialized!Detail: " + proxyMap);
 	}
@@ -93,9 +113,12 @@ public class ProxySpiderDispatcher implements Runnable {
 
 		while (proxyPool.size() < 20) {
 			startProxySpider(proxyPool);
-		}
-		while (proxyPool.size() > 25) {
-			proxyPool.get();
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		proxyPool.signalEnough();
 	}
@@ -108,14 +131,31 @@ public class ProxySpiderDispatcher implements Runnable {
 		AbstractProxySpider proxySpider = proxyMap.get(selectSpider(p));
 		log.info("Proxy spider selected: " + proxySpider + " And coming proxy is " + p);
 
-		try {
-			List<Proxy> proxyList = cacheThreadPool.submit(proxySpider).get();
-			if (proxyList != null && proxyList.size() > 0) {
-				proxyPool.putAll(proxyList);
+		if (proxySpider instanceof KuaiProxySpider) {
+			log.info("kuai dai li ");
+			Class<? extends AbstractProxySpider> clazz = proxySpider.getClass();
+			AbstractProxySpider newSpider = null;
+			for (int i = 0; i < 10; i++) {
+				log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>");
+				try {
+					newSpider = clazz.newInstance();
+				} catch (InstantiationException | IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				cacheThreadPool.execute(newSpider);
+
+				try {
+					Thread.sleep(rand.nextInt(5000));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		} catch (InterruptedException | ExecutionException e) {
-			log.error("Error getting proxy...", e);
+			return;
 		}
+
+		cacheThreadPool.execute(proxySpider);
 	}
 
 	/**

@@ -15,6 +15,7 @@
  */
 package cn.john.hub.spider;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -53,6 +54,7 @@ import cn.john.hub.spider.news.TechWebSpider;
 @Component
 public class NewsSpiderDispatcher implements Runnable {
 	private final Logger log = LogManager.getLogger("spider");
+
 	private ExecutorService cacheThreadPool;
 	private Random rand;
 	private ProxyPool proxyPool;
@@ -70,28 +72,44 @@ public class NewsSpiderDispatcher implements Runnable {
 		spiderList = new ArrayList<NewsSpiderWithTime>();
 		executeQueue = new LinkedList<AbstractNewsSpider>();
 		rand = new Random();
-		//先初始化代理Ip池
+		// 先初始化代理Ip池
 		proxyPool = ProxyPool.getInstance();
 		init();
 	}
 
 	private void init() {
 		// 注册newsspider类的实例
-		NewsSpiderWithTime<TechWebSpider> ns1 = new NewsSpiderWithTime<TechWebSpider>();
-		NewsSpiderWithTime<CnBetaSpider> ns2 = new NewsSpiderWithTime<CnBetaSpider>();
-		NewsSpiderWithTime<TaiMediaSpider> ns3 = new NewsSpiderWithTime<TaiMediaSpider>();
-		ns1.setClazz(TechWebSpider.class);
-		ns2.setClazz(CnBetaSpider.class);
-		ns3.setClazz(TaiMediaSpider.class);
 		DateTime now = new DateTime();
-		ns1.setExeTime(now.plusMinutes(rand.nextInt(1)));
-		ns2.setExeTime(now.plusMinutes(rand.nextInt(1)));
-		ns3.setExeTime(now.plusMinutes(rand.nextInt(1)));
 
-		spiderList.add(ns1);
-		spiderList.add(ns2);
-		spiderList.add(ns3);
-		log.info("News spider initialing....NewsSpiderMap: " + spiderList);
+		ClassLoader loader = this.getClass().getClassLoader();
+		String classPath = this.getClass().getResource("").getFile();
+		String packageName = this.getClass().getPackage().getName();
+
+		String newsClassPath = classPath + "news/";
+		String newsPackage = packageName + ".news";
+
+		File classes = new File(newsClassPath);
+		for (File f : classes.listFiles()) {
+			String fileName = f.getName();
+			// 代码尚不成熟
+			if (fileName.contains("Alpha")) {
+				continue;
+			}
+			try {
+				String className = newsPackage + "." + fileName.replace(".class", "");
+				@SuppressWarnings("unchecked")
+				Class<AbstractNewsSpider> clazz = (Class<AbstractNewsSpider>) loader.loadClass(className);
+				NewsSpiderWithTime<AbstractNewsSpider> spider = new NewsSpiderWithTime<>();
+				spider.setClazz(clazz);
+				spider.setExeTime(now.plusMinutes(rand.nextInt(1)));
+				spiderList.add(spider);
+			} catch (ClassNotFoundException e) {
+				log.error(e);
+			}
+		}
+		
+		log.info("News Spider List initiated:"+spiderList);
+		
 	}
 
 	/*
@@ -111,9 +129,9 @@ public class NewsSpiderDispatcher implements Runnable {
 		hb.setNewsSpiderBeat(timestamp);
 		hb.setNewsSpiderExeQueueInfo(executeQueue.toString());
 		hb.setNewsSpiderPoolInfo(cacheThreadPool.toString());
-		if ( executeQueue.size() < 6) {
+		if (executeQueue.size() < 6) {
 			try {
-				offerSpiderToQueue();
+				offerSpiderToQueue(spiderList);
 			} catch (InstantiationException e) {
 				log.error(e.getMessage());
 			} catch (IllegalAccessException e) {
@@ -123,20 +141,14 @@ public class NewsSpiderDispatcher implements Runnable {
 		if (executeQueue.size() > 0) {
 			AbstractNewsSpider newsSpider = executeQueue.poll();
 			log.info("Executing " + newsSpider);
-			try {
-				List<NewsDO> newsList = cacheThreadPool.submit(newsSpider).get();
-				if (newsList != null && newsList.size() > 0) {
-					nService.saveNews(newsList);
-				}
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-			}
+			cacheThreadPool.execute(newsSpider);
 		}
 
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void offerSpiderToQueue() throws InstantiationException, IllegalAccessException {
+	private void offerSpiderToQueue(List<NewsSpiderWithTime> spiderList)
+			throws InstantiationException, IllegalAccessException {
 		DateTime now = new DateTime();
 		Iterator<NewsSpiderWithTime> it = spiderList.iterator();
 		while (it.hasNext()) {
@@ -158,4 +170,5 @@ public class NewsSpiderDispatcher implements Runnable {
 			}
 		}
 	}
+
 }

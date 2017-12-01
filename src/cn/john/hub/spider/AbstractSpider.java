@@ -22,6 +22,8 @@ import org.apache.logging.log4j.Logger;
 
 import cn.john.hub.domain.ParseException;
 import cn.john.hub.domain.Proxy;
+import cn.john.hub.service.NewsService;
+import cn.john.hub.util.BeanUtil;
 import cn.john.hub.util.HttpClient;
 
 /**
@@ -37,7 +39,7 @@ import cn.john.hub.util.HttpClient;
  * 
  * 
  */
-public abstract class AbstractSpider<T> implements Callable<List<T>> {
+public abstract class AbstractSpider<T> implements Runnable {
 
 	protected static final Logger log = LogManager.getLogger("spider");
 
@@ -75,61 +77,63 @@ public abstract class AbstractSpider<T> implements Callable<List<T>> {
 	}
 
 	/**
-	
+	 * 
 	 * @Title: fetchProxyPool
-	
+	 * 
 	 * @Description: 获取代理池实例
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @return: ProxyPool
-	
+	 * 
 	 */
 	protected ProxyPool fetchProxyPool() {
 		return ProxyPool.getInstance();
 	}
 
 	/**
-	
+	 * 
 	 * @Title: fetchNewHttpClient
-	
+	 * 
 	 * @Description: 获取新的httpClient。具体的获取策略由子类实现。
-	
+	 * 
 	 * @param site
 	 * @return
-	
+	 * 
 	 * @return: HttpClient
-	
+	 * 
 	 */
 	protected abstract HttpClient fetchNewHttpClient(String site);
 
 	/**
-	
+	 * 
 	 * @Title: site
-	
+	 * 
 	 * @Description: 返回站点地址，由子类实现
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @return: String
-	
+	 * 
 	 */
 	protected abstract String site();
 
 	/**
-	
+	 * 
 	 * @Title: parseHtml
-	
+	 * 
 	 * @Description: 解析html，由子类实现
-	
+	 * 
 	 * @param html
 	 * @return
 	 * @throws ParseException
-	
+	 * 
 	 * @return: List<T>
-	
+	 * 
 	 */
 	protected abstract List<T> parseHtml(String html) throws ParseException;
+
+	protected abstract void consume(List<T> list);
 
 	/* (non Javadoc)
 	
@@ -144,7 +148,12 @@ public abstract class AbstractSpider<T> implements Callable<List<T>> {
 	
 	 */
 	@Override
-	public List<T> call() throws ParseException {
-		return parseHtml(getHtml(site()));
+	public void run() {
+		try {
+			consume(parseHtml(getHtml(site())));
+		} catch (ParseException e) {
+			String name = this.getClass().getName().replace(".class", "");
+			log.info(name + "---" + e.getMessage());
+		}
 	}
 }

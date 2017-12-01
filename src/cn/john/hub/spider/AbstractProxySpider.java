@@ -42,8 +42,8 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy> {
 	}
 
 	@Override
-	public List<Proxy> call() throws ParseException {
-		return super.call();
+	public void run() {
+		super.run();
 	}
 
 	protected HttpClient fetchNewHttpClient(String site) {
@@ -52,6 +52,13 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy> {
 		return HttpClientFactory.createUsingProxy(site, headers, pool, false);
 	}
 
+	@Override
+	protected void consume(List<Proxy> list) {
+		fetchProxyPool().putAll(list);
+	}
+
 	public abstract int getPossiblity();
+	
+	public abstract int getProxySpiderId();
 
 }
