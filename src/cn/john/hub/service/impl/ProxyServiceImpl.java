@@ -21,42 +21,67 @@ import org.springframework.stereotype.Service;
 
 import cn.john.hub.dao.ProxyMapper;
 import cn.john.hub.domain.Proxy;
+import cn.john.hub.domain.ProxyStatis;
 import cn.john.hub.service.ProxyService;
-import cn.john.hub.util.HttpClient;
+import cn.john.hub.util.LogUtil;
 
 /**
-
+ * 
  * @ClassName: ProxyServiceImpl
-
+ * 
  * @Description: TODO
-
+ * 
  * @author: John
-
+ * 
  * @date: 2017年6月20日 下午2:33:23
-
-
+ * 
+ * 
  */
 @Service
-public class ProxyServiceImpl implements ProxyService{
+public class ProxyServiceImpl implements ProxyService {
 	@Autowired
 	private ProxyMapper pMapper;
-	
-	private List<Proxy> proxyList;
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: saveProxy
-	
+	 * 
 	 * @Description: TODO
-	
-	
-	 * @see cn.john.hub.service.ProxyService#saveProxy()
-	
+	 * 
+	 * @param pList
+	 * 
+	 * @return
+	 * 
+	 * @see cn.john.hub.service.ProxyService#saveProxy(java.util.List)
+	 * 
 	 */
 	@Override
-	public void getProxy() {
-		
+	public boolean saveProxy(List<Proxy> pList) {
+		try {
+			pMapper.saveProxy(pList);
+			return true;
+		} catch (Exception e) {
+			LogUtil.getSpiderLogger().error("Error saving proxy!", e);
+			return false;
+		}
 	}
-	
-	
+
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: getProxyStatis
+	 * 
+	 * @Description: TODO
+	 * 
+	 * @return
+	 * 
+	 * @see cn.john.hub.service.ProxyService#getProxyStatis()
+	 * 
+	 */
+	@Override
+	public List<ProxyStatis> getProxyStatis() {
+		return pMapper.getProxyCounts();
+	}
+
 }

@@ -44,7 +44,7 @@ import cn.john.hub.spider.AbstractProxySpider;
  */
 public class DoubleSixProxySpider extends AbstractProxySpider {
 
-	private final int proxySpiderId = 1;
+	private final int proxySpiderId = 2;
 
 	private Random rand = new Random();
 
@@ -77,6 +77,7 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 				proxy.setIpAddr(tdList.get(0).text());
 				proxy.setPort(tdList.get(1).text());
 				proxy.setProxySpiderId(proxySpiderId);
+				proxy.setUseCount(0);
 				proxyList.add(proxy);
 			}
 			log.info("parse  double six proxy html completed!");

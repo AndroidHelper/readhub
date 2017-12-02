@@ -60,8 +60,8 @@ public class HttpClient {
 
 		builder = HttpClients.custom();
 
-		defaultReqCfg = RequestConfig.custom().setSocketTimeout(10000).setConnectTimeout(10000)
-				.setConnectionRequestTimeout(10000).build();
+		defaultReqCfg = RequestConfig.custom().setSocketTimeout(20000).setConnectTimeout(20000)
+				.setConnectionRequestTimeout(20000).build();
 
 		responseHandler = new ResponseHandler<String>() {
 			public String handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
@@ -106,7 +106,7 @@ public class HttpClient {
 		try {
 			return httpClient.execute(httpResq, responseHandler);
 		} catch (Exception e) {
-			log.error("HttpClient Error!", e);
+			log.error("HttpClient Error!", e.getMessage());
 			return null;
 		} finally {
 			try {

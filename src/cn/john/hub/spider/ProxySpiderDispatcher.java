@@ -135,8 +135,7 @@ public class ProxySpiderDispatcher implements Runnable {
 			log.info("kuai dai li ");
 			Class<? extends AbstractProxySpider> clazz = proxySpider.getClass();
 			AbstractProxySpider newSpider = null;
-			for (int i = 0; i < 10; i++) {
-				log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>");
+			for (int i = 0; i < 3; i++) {
 				try {
 					newSpider = clazz.newInstance();
 				} catch (InstantiationException | IllegalAccessException e) {

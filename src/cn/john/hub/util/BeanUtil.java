@@ -26,6 +26,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cn.john.hub.domain.Heartbeat;
 import cn.john.hub.service.NewsService;
+import cn.john.hub.service.ProxyService;
 
 /**
  * 
@@ -48,6 +49,11 @@ public class BeanUtil {
 	}
 
 	public static NewsService getNewsServiceBean() {
-		return (NewsService) appContext.getBean("newsService");
+		return (NewsService) appContext.getBean("newsServiceImpl");
 	}
+	public static ProxyService getProxyServiceBean() {
+		return (ProxyService) appContext.getBean("proxyServiceImpl");
+	}
+	
+	
 }

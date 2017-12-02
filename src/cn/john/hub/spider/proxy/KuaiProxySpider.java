@@ -44,7 +44,7 @@ import cn.john.hub.spider.AbstractProxySpider;
  */
 public class KuaiProxySpider extends AbstractProxySpider {
 
-	private final int proxySpiderId = 3;
+	private final int proxySpiderId = 4;
 
 	private Random rand = new Random();
 
@@ -111,6 +111,7 @@ public class KuaiProxySpider extends AbstractProxySpider {
 					p.setIpAddr(tdList.get(0).text());
 					p.setPort(tdList.get(1).text());
 					p.setProxySpiderId(proxySpiderId);
+					p.setUseCount(0);
 					proxyList.add(p);
 				}
 			}

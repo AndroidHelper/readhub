@@ -43,7 +43,7 @@ import cn.john.hub.spider.AbstractProxySpider;
  */
 public class IPOneEightOneProxySpider extends AbstractProxySpider {
 
-	private final int proxySpiderId = 2;
+	private final int proxySpiderId = 3;
 
 	/*
 	 * (non Javadoc)
@@ -98,6 +98,7 @@ public class IPOneEightOneProxySpider extends AbstractProxySpider {
 					proxy.setIpAddr(tdList.get(0).text());
 					proxy.setPort(tdList.get(1).text());
 					proxy.setProxySpiderId(proxySpiderId);
+					proxy.setUseCount(0);
 					proxyList.add(proxy);
 				}
 			}

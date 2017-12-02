@@ -28,8 +28,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import cn.john.hub.dao.AccessMapper;
 import cn.john.hub.domain.Heartbeat;
+import cn.john.hub.domain.ProxyStatis;
 import cn.john.hub.domain.Visitor;
 import cn.john.hub.service.AccessService;
+import cn.john.hub.service.ProxyService;
 
 /**
  * 
@@ -49,6 +51,8 @@ public class MonitorController {
 	private AccessService aService;
 	@Autowired
 	private Heartbeat hb;
+	@Autowired
+	private ProxyService pService;
 
 	@RequestMapping("/monitor")
 	public String monitor() {
@@ -60,14 +64,14 @@ public class MonitorController {
 	public HashMap<String, Object> listMonitorItems() {
 		HashMap<String, Object> map = new HashMap<>();
 		List<Visitor> ipList = aService.listAccessRecordToday();
+		List<ProxyStatis> psList = pService.getProxyStatis();
 		if (ipList.size() > 0) {
 			map.put("visitor", ipList);
 		}
-		map.put("nsq", hb.getNewsSpiderExeQueueInfo());
-		map.put("nsp", hb.getNewsSpiderPoolInfo());
-		map.put("psp", hb.getProxySpiderPoolInfo());
-		map.put("lsnc", hb.getLastSavedNewsCount());
 
+		map.put("nsq", hb.getNewsSpiderExeQueueInfo());
+		map.put("psList", psList);
+		
 		long now = System.currentTimeMillis();
 
 		if ((now - hb.getNewsSpiderBeat()) / 1000 > 60) {
@@ -75,16 +79,12 @@ public class MonitorController {
 		} else {
 			map.put("nsd", "Running");
 		}
-		if ((now - hb.getProxySpiderBeat()) / 1000 > 60) {
-			map.put("psd", "Unknown");
-		} else {
-			map.put("psd", "Running");
-		}
 		if ((now - hb.getIpLocaterBeat()) / 1000 > 300) {
 			map.put("ip", "Unknown");
 		} else {
 			map.put("ip", "Running");
 		}
+
 		return map;
 	}
 
@@ -93,13 +93,13 @@ public class MonitorController {
 	public String chekcClasses() {
 		ClassLoader loader = this.getClass().getClassLoader();
 		String thisFolder = this.getClass().getResource("").getFile();
-		String newsFolder = thisFolder.replaceAll("controller", "spider")+"news/";
+		String newsFolder = thisFolder.replaceAll("controller", "spider") + "news/";
 		File dir = new File(newsFolder.substring(1, newsFolder.length()));
-		for(File f:dir.listFiles()){
+		for (File f : dir.listFiles()) {
 			try {
 				Class<?> clazz = loader.loadClass("cn.john.hub.spider.news.Test");
 				Method[] method = clazz.getMethods();
-				for(Method m:method){
+				for (Method m : method) {
 					System.out.println(m.getName());
 				}
 			} catch (ClassNotFoundException e) {
@@ -109,13 +109,5 @@ public class MonitorController {
 		}
 		return null;
 	}
-	
-	public static void main(String[] args) {
-		String thisFolder = MonitorController.class.getResource("").getFile();
-		String newsFolder = thisFolder.replaceAll("controller", "spider")+"news/";
-		File dir = new File(newsFolder);
-		for(File f:dir.listFiles()){
-			System.out.println(f);
-		}
-	}
+
 }

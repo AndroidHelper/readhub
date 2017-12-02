@@ -15,6 +15,7 @@
  */
 package cn.john.hub.spider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.annotation.PostConstruct;
 
 import cn.john.hub.domain.Proxy;
+import cn.john.hub.util.BeanUtil;
 import cn.john.hub.util.LogUtil;
 
 /**
@@ -93,15 +95,26 @@ public class ProxyPool {
 	 * @return: void
 	 * 
 	 */
-	public void offerFirst(Proxy proxy) {
+	public void recycle(Proxy proxy) {
+		if (proxy.getUseCount() == null) {
+			proxy.setUseCount(1);
+		} else {
+			proxy.setUseCount(proxy.getUseCount() + 1);
+		}
 		pool.offerFirst(proxy);
+	}
+
+	public void discard(Proxy proxy) {
+		List<Proxy> list = new ArrayList<>();
+		list.add(proxy);
+		BeanUtil.getProxyServiceBean().saveProxy(list);
 	}
 
 	public void putAll(List<Proxy> proxyList) {
 		pool.addAll(proxyList);
 	}
 
-	public Proxy poll() {
+	public Proxy getUntilEmpty() {
 		return pool.poll();
 	}
 
@@ -121,13 +134,13 @@ public class ProxyPool {
 	 * @return: Proxy
 	 * 
 	 */
-	public Proxy get() {
-		if (pool.size() > 30) {
+	public Proxy getAndWaitAtSize(int size) {
+		if (pool.size() > (size * 2)) {
 			return pool.poll();
 		}
 		lock.lock();
 		try {
-			if (pool.size() < 20) {
+			if (pool.size() < size) {
 				LogUtil.getSpiderLogger()
 						.info("Pool size is " + pool.size() + " Lack of proxy!Triggering proxy spider and wait!");
 				ste.submit(psd);

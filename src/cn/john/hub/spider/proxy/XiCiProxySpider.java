@@ -45,7 +45,7 @@ import cn.john.hub.util.HubConsts;
  */
 public class XiCiProxySpider extends AbstractProxySpider {
 
-	private final int proxySpiderId = 0;
+	private final int proxySpiderId = 1;
 
 	/*
 	 * (non Javadoc)
@@ -93,6 +93,7 @@ public class XiCiProxySpider extends AbstractProxySpider {
 				proxy.setIpAddr((String) map.get(2));
 				proxy.setPort((String) map.get(3));
 				proxy.setProxySpiderId(proxySpiderId);
+				proxy.setUseCount(0);
 				proxyList.add(proxy);
 			}
 			log.info("parse xici proxy html completed!");

@@ -14,6 +14,7 @@
  */
 package cn.john.hub.spider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -23,8 +24,10 @@ import org.apache.logging.log4j.Logger;
 import cn.john.hub.domain.ParseException;
 import cn.john.hub.domain.Proxy;
 import cn.john.hub.service.NewsService;
+import cn.john.hub.service.ProxyService;
 import cn.john.hub.util.BeanUtil;
 import cn.john.hub.util.HttpClient;
+import cn.john.hub.util.HttpClientFactory;
 
 /**
  * 
@@ -62,33 +65,25 @@ public abstract class AbstractSpider<T> implements Runnable {
 	protected String getHtml(String site) {
 		String html = null;
 		HttpClient httpClient = null;
+		Proxy p = null;
 		while (html == null) {
 			log.info(this + " trying getting html...");
 			httpClient = fetchNewHttpClient(site);
 			html = httpClient.getData();
+			p = httpClient.getProxy();
+			if (p != null) {
+				if (html == null) {
+					HttpClientFactory.discardProxy(p);
+				} else {
+					// 如果该httpClient使用了代理，并且该代理请求网站成功返回，证明代理可用，重新入池。
+					HttpClientFactory.recycleProxy(p);
+				}
+			} else {
+				HttpClientFactory.recordLocalHost();
+			}
 		}
 		log.info(this + " html got!");
-		// 如果该httpClient使用了代理，并且该代理请求网站成功返回，证明代理可用，重新入池。
-		Proxy p = httpClient.getProxy();
-		if (p != null) {
-			fetchProxyPool().offerFirst(p);
-		}
 		return html;
-	}
-
-	/**
-	 * 
-	 * @Title: fetchProxyPool
-	 * 
-	 * @Description: 获取代理池实例
-	 * 
-	 * @return
-	 * 
-	 * @return: ProxyPool
-	 * 
-	 */
-	protected ProxyPool fetchProxyPool() {
-		return ProxyPool.getInstance();
 	}
 
 	/**
@@ -135,17 +130,19 @@ public abstract class AbstractSpider<T> implements Runnable {
 
 	protected abstract void consume(List<T> list);
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: call
-	
+	 * 
 	 * @Description: 线程执行方法
-	
+	 * 
 	 * @return
+	 * 
 	 * @throws ParseException
-	
+	 * 
 	 * @see java.util.concurrent.Callable#call()
-	
+	 * 
 	 */
 	@Override
 	public void run() {

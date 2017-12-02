@@ -161,7 +161,7 @@ public class NewsSpiderDispatcher implements Runnable {
 				AbstractNewsSpider spiderIns = (AbstractNewsSpider) spider.getClazz().newInstance();
 				executeQueue.offer(spiderIns);
 
-				int delayTime = spiderIns.getDelayFactor() + rand.nextInt(30);
+				int delayTime = spiderIns.getDelayFactor() + rand.nextInt(100);
 				DateTime nextExeTime = exeTime.plusSeconds(delayTime);
 				spider.setExeTime(nextExeTime);
 

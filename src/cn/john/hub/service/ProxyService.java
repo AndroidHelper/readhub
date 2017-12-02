@@ -14,6 +14,11 @@
  */
 package cn.john.hub.service;
 
+import java.util.List;
+
+import cn.john.hub.domain.Proxy;
+import cn.john.hub.domain.ProxyStatis;
+
 /**
 
  * @ClassName: ProxyService1
@@ -27,5 +32,6 @@ package cn.john.hub.service;
 
  */
 public interface ProxyService {
-	void getProxy();
+	boolean saveProxy(List<Proxy> pList);
+	List<ProxyStatis> getProxyStatis();
 }

@@ -47,18 +47,28 @@ public abstract class AbstractProxySpider extends AbstractSpider<Proxy> {
 	}
 
 	protected HttpClient fetchNewHttpClient(String site) {
-		ProxyPool pool = fetchProxyPool();
 		List<Header> headers = HeaderUtil.getBrowserLikeHeaders();
-		return HttpClientFactory.createUsingProxy(site, headers, pool, false);
+		return HttpClientFactory.createUsingProxy(site, headers, false);
 	}
 
+	/* (non Javadoc)
+	
+	 * @Title: consume
+	
+	 * @Description: 定义代理爬虫的消费者
+	
+	 * @param list
+	
+	 * @see cn.john.hub.spider.AbstractSpider#consume(java.util.List)
+	
+	 */
 	@Override
 	protected void consume(List<Proxy> list) {
-		fetchProxyPool().putAll(list);
+		ProxyPool.getInstance().putAll(list);
 	}
 
 	public abstract int getPossiblity();
-	
+
 	public abstract int getProxySpiderId();
 
 }

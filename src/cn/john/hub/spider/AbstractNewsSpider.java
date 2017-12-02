@@ -49,11 +49,21 @@ public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 	}
 
 	protected HttpClient fetchNewHttpClient(String site) {
-		ProxyPool pool = fetchProxyPool();
 		List<Header> headers = HeaderUtil.getBrowserLikeHeaders();
-		return HttpClientFactory.createUsingProxy(site, headers, pool, true);
+		return HttpClientFactory.createUsingProxy(site, headers, true);
 	}
 
+	/* (non Javadoc)
+	
+	 * @Title: consume
+	
+	 * @Description: 定义新闻
+	
+	 * @param list
+	
+	 * @see cn.john.hub.spider.AbstractSpider#consume(java.util.List)
+	
+	 */
 	@Override
 	protected void consume(List<NewsDO> list) {
 		BeanUtil.getNewsServiceBean().saveNews(list);
