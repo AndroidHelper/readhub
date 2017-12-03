@@ -126,16 +126,17 @@ public class IPOneEightOneProxySpider extends AbstractProxySpider {
 		return "2----IPOneEightOneProxySpider";
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: getPossiblity
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractProxySpider#getPossiblity()
-	
+	 * 
 	 */
 	@Override
 	public int getPossiblity() {
@@ -143,21 +144,42 @@ public class IPOneEightOneProxySpider extends AbstractProxySpider {
 		return 15;
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: getProxySpiderId
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySpiderId()
-	
+	 * 
 	 */
 	@Override
 	public int getProxySpiderId() {
 		// TODO Auto-generated method stub
 		return proxySpiderId;
+	}
+
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: listExeInstances
+	 * 
+	 * @Description: TODO
+	 * 
+	 * @return
+	 * 
+	 * @see cn.john.hub.spider.AbstractProxySpider#listExeInstances()
+	 * 
+	 */
+	@Override
+	protected List<AbstractProxySpider> listExeInstances() {
+		// TODO Auto-generated method stub
+		List<AbstractProxySpider> list = new ArrayList<>();
+		list.add(this);
+		return list;
 	}
 
 }

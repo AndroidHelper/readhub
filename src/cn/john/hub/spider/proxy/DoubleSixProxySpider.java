@@ -130,4 +130,23 @@ public class DoubleSixProxySpider extends AbstractProxySpider {
 		// TODO Auto-generated method stub
 		return proxySpiderId;
 	}
+
+	/* (non Javadoc)
+	
+	 * @Title: listExeInstances
+	
+	 * @Description: TODO
+	
+	 * @return
+	
+	 * @see cn.john.hub.spider.AbstractProxySpider#listExeInstances()
+	
+	 */
+	@Override
+	protected List<AbstractProxySpider> listExeInstances() {
+		// TODO Auto-generated method stub
+		List<AbstractProxySpider> list = new ArrayList<>();
+		list.add(this);
+		return list;
+	}
 }

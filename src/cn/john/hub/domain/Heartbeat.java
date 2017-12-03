@@ -32,85 +32,58 @@ import org.springframework.stereotype.Component;
 @Component
 public class Heartbeat {
 
-	private volatile long newsSaverBeat;
 	private volatile long newsSpiderBeat;
-	private volatile long proxySpiderBeat;
 	private volatile long ipLocaterBeat;
-	private volatile String newsSpiderPoolInfo;
-	private volatile String proxySpiderPoolInfo;
-	private volatile String newsSpiderExeQueueInfo;
-	private volatile Integer lastSavedNewsCount;
 
-	public long getNewsSaverBeat() {
-		return newsSaverBeat;
-	}
-
-	public void setNewsSaverBeat(long newsSaverBeat) {
-		this.newsSaverBeat = newsSaverBeat;
-	}
-
+	/**
+	 * 
+	 * @return the newsSpiderBeat
+	 * 
+	 */
 	public long getNewsSpiderBeat() {
 		return newsSpiderBeat;
 	}
 
+	/**
+	 * @param newsSpiderBeat
+	 *            the newsSpiderBeat to set
+	 */
 	public void setNewsSpiderBeat(long newsSpiderBeat) {
 		this.newsSpiderBeat = newsSpiderBeat;
 	}
 
-	public long getProxySpiderBeat() {
-		return proxySpiderBeat;
-	}
-
-	public void setProxySpiderBeat(long proxySpiderBeat) {
-		this.proxySpiderBeat = proxySpiderBeat;
-	}
-
+	/**
+	 * 
+	 * @return the ipLocaterBeat
+	 * 
+	 */
 	public long getIpLocaterBeat() {
 		return ipLocaterBeat;
 	}
 
+	/**
+	 * @param ipLocaterBeat
+	 *            the ipLocaterBeat to set
+	 */
 	public void setIpLocaterBeat(long ipLocaterBeat) {
 		this.ipLocaterBeat = ipLocaterBeat;
 	}
 
-	public String getNewsSpiderPoolInfo() {
-		return newsSpiderPoolInfo;
-	}
-
-	public void setNewsSpiderPoolInfo(String newsSpiderPoolInfo) {
-		this.newsSpiderPoolInfo = newsSpiderPoolInfo;
-	}
-
-	public String getProxySpiderPoolInfo() {
-		return proxySpiderPoolInfo;
-	}
-
-	public void setProxySpiderPoolInfo(String proxySpiderPoolInfo) {
-		this.proxySpiderPoolInfo = proxySpiderPoolInfo;
-	}
-
-	public String getNewsSpiderExeQueueInfo() {
-		return newsSpiderExeQueueInfo;
-	}
-
-	public void setNewsSpiderExeQueueInfo(String newsSpiderExeQueueInfo) {
-		this.newsSpiderExeQueueInfo = newsSpiderExeQueueInfo;
-	}
-
-	public Integer getLastSavedNewsCount() {
-		return lastSavedNewsCount;
-	}
-
-	public void setLastSavedNewsCount(Integer lastSavedNewsCount) {
-		this.lastSavedNewsCount = lastSavedNewsCount;
-	}
-
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: toString
+	 * 
+	 * @Description: TODO
+	 * 
+	 * @return
+	 * 
+	 * @see java.lang.Object#toString()
+	 * 
+	 */
 	@Override
 	public String toString() {
-		return "Heartbeat [newsSaverBeat=" + newsSaverBeat + ", newsSpiderBeat=" + newsSpiderBeat + ", proxySpiderBeat="
-				+ proxySpiderBeat + ", ipLocaterBeat=" + ipLocaterBeat + ", newsSpiderPoolInfo=" + newsSpiderPoolInfo
-				+ ", proxySpiderPoolInfo=" + proxySpiderPoolInfo + ", newsSpiderExeQueueInfo=" + newsSpiderExeQueueInfo
-				+ ", lastSavedNewsCount=" + lastSavedNewsCount + "]";
+		return "Heartbeat [newsSpiderBeat=" + newsSpiderBeat + ", ipLocaterBeat=" + ipLocaterBeat + "]";
 	}
 
 }

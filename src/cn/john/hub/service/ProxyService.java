@@ -33,5 +33,5 @@ import cn.john.hub.domain.ProxyStatis;
  */
 public interface ProxyService {
 	boolean saveProxy(List<Proxy> pList);
-	List<ProxyStatis> getProxyStatis();
+	List<ProxyStatis> listProxyStatis();
 }

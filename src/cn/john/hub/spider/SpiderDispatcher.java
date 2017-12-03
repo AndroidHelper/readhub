@@ -48,10 +48,14 @@ public class SpiderDispatcher {
 
 	@PostConstruct
 	private void startDeamon() {
-
-		ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(3);
-		// 负责爬取新闻信息
-		stpe.scheduleWithFixedDelay(nsd, 5, 5, TimeUnit.SECONDS);
-
+		Thread t = new Thread() {
+			public void run() {
+				ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(3);
+				// 负责爬取新闻信息
+				stpe.scheduleWithFixedDelay(nsd, 5, 5, TimeUnit.SECONDS);
+			}
+		};
+		t.setDaemon(true);
+		t.start();
 	}
 }

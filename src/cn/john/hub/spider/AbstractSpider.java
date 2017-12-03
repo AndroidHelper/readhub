@@ -45,6 +45,8 @@ import cn.john.hub.util.HttpClientFactory;
 public abstract class AbstractSpider<T> implements Runnable {
 
 	protected static final Logger log = LogManager.getLogger("spider");
+	
+	private HttpClient httpClient;
 
 	protected AbstractSpider() {
 	}
@@ -64,7 +66,6 @@ public abstract class AbstractSpider<T> implements Runnable {
 	 */
 	protected String getHtml(String site) {
 		String html = null;
-		HttpClient httpClient = null;
 		Proxy p = null;
 		while (html == null) {
 			log.info(this + " trying getting html...");
@@ -73,7 +74,7 @@ public abstract class AbstractSpider<T> implements Runnable {
 			p = httpClient.getProxy();
 			if (p != null) {
 				if (html == null) {
-					HttpClientFactory.discardProxy(p);
+					HttpClientFactory.discardProxy(httpClient.getProxy());
 				} else {
 					// 如果该httpClient使用了代理，并且该代理请求网站成功返回，证明代理可用，重新入池。
 					HttpClientFactory.recycleProxy(p);
@@ -151,6 +152,7 @@ public abstract class AbstractSpider<T> implements Runnable {
 		} catch (ParseException e) {
 			String name = this.getClass().getName().replace(".class", "");
 			log.info(name + "---" + e.getMessage());
+			HttpClientFactory.discardProxy(httpClient.getProxy());
 		}
 	}
 }

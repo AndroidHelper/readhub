@@ -43,7 +43,7 @@ import cn.john.hub.util.SiteEnum;
  */
 public class TechWebSpider extends AbstractNewsSpider {
 
-	private static final int serialNumber = 0;
+	private static final int newsSpiderId = 1;
 
 	private static final int delayFactor = 20;
 
@@ -89,7 +89,7 @@ public class TechWebSpider extends AbstractNewsSpider {
 			log.info("Parse completed!size is " + newsList.size());
 			return newsList;
 		} catch (Exception e) {
-			throw new ParseException("Parse techweb html failed!", e);
+			throw new ParseException("Parse techweb html failed!html is"+html, e);
 		}
 	}
 
@@ -129,9 +129,9 @@ public class TechWebSpider extends AbstractNewsSpider {
 	 * 
 	 */
 	@Override
-	public int getSerialNumber() {
+	public int getSpiderId() {
 		// TODO Auto-generated method stub
-		return serialNumber;
+		return newsSpiderId;
 	}
 
 	/* (non Javadoc)

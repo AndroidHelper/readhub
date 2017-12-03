@@ -80,7 +80,7 @@ public class ProxyServiceImpl implements ProxyService {
 	 * 
 	 */
 	@Override
-	public List<ProxyStatis> getProxyStatis() {
+	public List<ProxyStatis> listProxyStatis() {
 		return pMapper.getProxyCounts();
 	}
 

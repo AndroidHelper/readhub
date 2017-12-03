@@ -48,16 +48,17 @@ public class KuaiProxySpider extends AbstractProxySpider {
 
 	private Random rand = new Random();
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: getPossiblity
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractProxySpider#getPossiblity()
-	
+	 * 
 	 */
 	@Override
 	public int getPossiblity() {
@@ -65,34 +66,38 @@ public class KuaiProxySpider extends AbstractProxySpider {
 		return 20;
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: site
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractSpider#site()
-	
+	 * 
 	 */
 	@Override
 	public String site() {
 		return "http://www.kuaidaili.com/ops/proxylist/" + (rand.nextInt(11) + 1);
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: parseHtml
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @param html
+	 * 
 	 * @return
+	 * 
 	 * @throws ParseException
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractSpider#parseHtml(java.lang.String)
-	
+	 * 
 	 */
 	@Override
 	protected List<Proxy> parseHtml(String html) throws ParseException {
@@ -127,21 +132,50 @@ public class KuaiProxySpider extends AbstractProxySpider {
 		return "3----KuaiProxySpider";
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: getProxySpiderId
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySpiderId()
-	
+	 * 
 	 */
 	@Override
 	public int getProxySpiderId() {
 		// TODO Auto-generated method stub
 		return proxySpiderId;
+	}
+
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: listExeInstances
+	 * 
+	 * @Description: TODO
+	 * 
+	 * @return
+	 * 
+	 * @see cn.john.hub.spider.AbstractProxySpider#listExeInstances()
+	 * 
+	 */
+	@Override
+	protected List<AbstractProxySpider> listExeInstances() {
+		// TODO Auto-generated method stub
+		List<AbstractProxySpider> list = new ArrayList<>();
+		list.add(this);
+		for (int i = 0; i < 3; i++) {
+			try {
+				list.add(this.getClass().newInstance());
+			} catch (InstantiationException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return list;
 	}
 
 }

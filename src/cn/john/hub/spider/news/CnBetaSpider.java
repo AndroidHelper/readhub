@@ -42,7 +42,7 @@ import cn.john.hub.spider.AbstractNewsSpider;
  */
 public class CnBetaSpider extends AbstractNewsSpider {
 
-	private static final int serialNumber = 1;
+	private static final int newsSpiderId = 2;
 
 	private static final int delayFactor = 10;
 
@@ -60,7 +60,7 @@ public class CnBetaSpider extends AbstractNewsSpider {
 	
 	 */
 	@Override
-	protected int getDelayFactor() {
+	public int getDelayFactor() {
 		// TODO Auto-generated method stub
 		return delayFactor;
 	}
@@ -77,9 +77,9 @@ public class CnBetaSpider extends AbstractNewsSpider {
 	
 	 */
 	@Override
-	protected int getSerialNumber() {
+	public int getSpiderId() {
 		// TODO Auto-generated method stub
-		return serialNumber;
+		return newsSpiderId;
 	}
 
 	/* (non Javadoc)
@@ -138,7 +138,7 @@ public class CnBetaSpider extends AbstractNewsSpider {
 			log.info("Parse cnbeta news completed!size is " + newsList.size());
 			return newsList;
 		} catch (Exception e) {
-			throw new ParseException("Parse cnbeta html failed!", e);
+			throw new ParseException("Parse cnbeta html failed!html is "+html, e);
 		}
 	}
 }

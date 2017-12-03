@@ -42,7 +42,7 @@ import cn.john.hub.spider.AbstractNewsSpider;
  */
 public class TaiMediaSpider extends AbstractNewsSpider {
 
-	private static final int serialNumber = 2;
+	private static final int newsSpiderId = 3;
 
 	private static final int delayFactor = 15;
 
@@ -60,7 +60,7 @@ public class TaiMediaSpider extends AbstractNewsSpider {
 	
 	 */
 	@Override
-	protected int getDelayFactor() {
+	public int getDelayFactor() {
 		// TODO Auto-generated method stub
 		return delayFactor;
 	}
@@ -77,9 +77,9 @@ public class TaiMediaSpider extends AbstractNewsSpider {
 	
 	 */
 	@Override
-	protected int getSerialNumber() {
+	public int getSpiderId() {
 		// TODO Auto-generated method stub
-		return serialNumber;
+		return newsSpiderId;
 	}
 
 	/* (non Javadoc)
@@ -139,7 +139,7 @@ public class TaiMediaSpider extends AbstractNewsSpider {
 			log.info("Parsing taimedia news completed!");
 			return newsList;
 		} catch (Exception e) {
-			throw new ParseException("Parse taimedia html failed!", e);
+			throw new ParseException("Parse taimedia html failed!html is"+html, e);
 		}
 	}
 

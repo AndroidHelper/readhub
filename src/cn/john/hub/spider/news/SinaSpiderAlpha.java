@@ -41,7 +41,7 @@ import cn.john.hub.spider.AbstractNewsSpider;
  */
 public class SinaSpiderAlpha extends AbstractNewsSpider{
 	
-	private static final int serialNumber = 3;
+	private static final int newsSpiderId = 4;
 
 	private static final int delayFactor = 1;
 
@@ -59,7 +59,7 @@ public class SinaSpiderAlpha extends AbstractNewsSpider{
 	
 	 */
 	@Override
-	protected int getDelayFactor() {
+	public int getDelayFactor() {
 		return delayFactor;
 	}
 
@@ -75,8 +75,8 @@ public class SinaSpiderAlpha extends AbstractNewsSpider{
 	
 	 */
 	@Override
-	protected int getSerialNumber() {
-		return serialNumber;
+	public int getSpiderId() {
+		return newsSpiderId;
 	}
 
 	/* (non Javadoc)

@@ -28,9 +28,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import cn.john.hub.dao.AccessMapper;
 import cn.john.hub.domain.Heartbeat;
+import cn.john.hub.domain.NewsSpiderRecord;
 import cn.john.hub.domain.ProxyStatis;
 import cn.john.hub.domain.Visitor;
 import cn.john.hub.service.AccessService;
+import cn.john.hub.service.NewsService;
 import cn.john.hub.service.ProxyService;
 
 /**
@@ -53,6 +55,8 @@ public class MonitorController {
 	private Heartbeat hb;
 	@Autowired
 	private ProxyService pService;
+	@Autowired
+	private NewsService nService;
 
 	@RequestMapping("/monitor")
 	public String monitor() {
@@ -64,14 +68,15 @@ public class MonitorController {
 	public HashMap<String, Object> listMonitorItems() {
 		HashMap<String, Object> map = new HashMap<>();
 		List<Visitor> ipList = aService.listAccessRecordToday();
-		List<ProxyStatis> psList = pService.getProxyStatis();
+		List<ProxyStatis> psList = pService.listProxyStatis();
+		List<NewsSpiderRecord> nsList = nService.listNewsStatis();
 		if (ipList.size() > 0) {
 			map.put("visitor", ipList);
 		}
 
-		map.put("nsq", hb.getNewsSpiderExeQueueInfo());
 		map.put("psList", psList);
-		
+		map.put("nsList", nsList);
+
 		long now = System.currentTimeMillis();
 
 		if ((now - hb.getNewsSpiderBeat()) / 1000 > 60) {

@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,12 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cn.john.hub.domain.Heartbeat;
-import cn.john.hub.domain.NewsDO;
 import cn.john.hub.domain.NewsSpiderWithTime;
-import cn.john.hub.service.NewsService;
-import cn.john.hub.spider.news.CnBetaSpider;
-import cn.john.hub.spider.news.TaiMediaSpider;
-import cn.john.hub.spider.news.TechWebSpider;
 
 /**
  * 
@@ -57,14 +51,11 @@ public class NewsSpiderDispatcher implements Runnable {
 
 	private ExecutorService cacheThreadPool;
 	private Random rand;
-	private ProxyPool proxyPool;
 	@SuppressWarnings("rawtypes")
 	private List<NewsSpiderWithTime> spiderList;
 	private LinkedList<AbstractNewsSpider> executeQueue;
 	@Autowired
 	private Heartbeat hb;
-	@Autowired
-	private NewsService nService;
 
 	@SuppressWarnings("rawtypes")
 	public NewsSpiderDispatcher() {
@@ -72,12 +63,10 @@ public class NewsSpiderDispatcher implements Runnable {
 		spiderList = new ArrayList<NewsSpiderWithTime>();
 		executeQueue = new LinkedList<AbstractNewsSpider>();
 		rand = new Random();
-		// 先初始化代理Ip池
-		proxyPool = ProxyPool.getInstance();
-		init();
+		registerNewsSpiders();
 	}
 
-	private void init() {
+	private void registerNewsSpiders() {
 		// 注册newsspider类的实例
 		DateTime now = new DateTime();
 
@@ -101,15 +90,15 @@ public class NewsSpiderDispatcher implements Runnable {
 				Class<AbstractNewsSpider> clazz = (Class<AbstractNewsSpider>) loader.loadClass(className);
 				NewsSpiderWithTime<AbstractNewsSpider> spider = new NewsSpiderWithTime<>();
 				spider.setClazz(clazz);
-				spider.setExeTime(now.plusMinutes(rand.nextInt(1)));
+				spider.setExeTime(now.plusMinutes(rand.nextInt(10)));
 				spiderList.add(spider);
 			} catch (ClassNotFoundException e) {
 				log.error(e);
 			}
 		}
-		
-		log.info("News Spider List initiated:"+spiderList);
-		
+
+		log.info("News Spider List initiated:" + spiderList);
+
 	}
 
 	/*
@@ -127,28 +116,20 @@ public class NewsSpiderDispatcher implements Runnable {
 	public void run() {
 		long timestamp = System.currentTimeMillis();
 		hb.setNewsSpiderBeat(timestamp);
-		hb.setNewsSpiderExeQueueInfo(executeQueue.toString());
-		hb.setNewsSpiderPoolInfo(cacheThreadPool.toString());
+
 		if (executeQueue.size() < 6) {
-			try {
-				offerSpiderToQueue(spiderList);
-			} catch (InstantiationException e) {
-				log.error(e.getMessage());
-			} catch (IllegalAccessException e) {
-				log.error(e.getMessage());
-			}
+			offerSpiderToQueue(spiderList);
 		}
+
 		if (executeQueue.size() > 0) {
 			AbstractNewsSpider newsSpider = executeQueue.poll();
 			log.info("Executing " + newsSpider);
 			cacheThreadPool.execute(newsSpider);
 		}
-
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void offerSpiderToQueue(List<NewsSpiderWithTime> spiderList)
-			throws InstantiationException, IllegalAccessException {
+	private void offerSpiderToQueue(List<NewsSpiderWithTime> spiderList) {
 		DateTime now = new DateTime();
 		Iterator<NewsSpiderWithTime> it = spiderList.iterator();
 		while (it.hasNext()) {
@@ -158,11 +139,15 @@ public class NewsSpiderDispatcher implements Runnable {
 
 			if (now.isAfter(exeTime)) {
 
-				AbstractNewsSpider spiderIns = (AbstractNewsSpider) spider.getClazz().newInstance();
+				AbstractNewsSpider spiderIns = null;
+				try {
+					spiderIns = (AbstractNewsSpider) spider.getClazz().newInstance();
+				} catch (InstantiationException | IllegalAccessException e) {
+					e.printStackTrace();
+				}
 				executeQueue.offer(spiderIns);
-
-				int delayTime = spiderIns.getDelayFactor() + rand.nextInt(100);
-				DateTime nextExeTime = exeTime.plusSeconds(delayTime);
+				int delayTime = spiderIns.getDelayFactor() + rand.nextInt(30);
+				DateTime nextExeTime = exeTime.plusMinutes(delayTime);
 				spider.setExeTime(nextExeTime);
 
 				log.info("Offer " + spider.getClazz().getSimpleName() + " to queue! Next exe time:"

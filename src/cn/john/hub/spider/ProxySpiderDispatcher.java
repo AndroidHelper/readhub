@@ -18,6 +18,7 @@ package cn.john.hub.spider;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -25,6 +26,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,18 +55,20 @@ public class ProxySpiderDispatcher implements Runnable {
 
 	private static Logger log = LogManager.getLogger("spider");
 
-	private ExecutorService cacheThreadPool;
+	private ThreadPoolExecutor cacheThreadPool;
 	private HashMap<Integer, AbstractProxySpider> proxyMap;
 	private Random rand = new Random();
+	private List<Class<? extends AbstractProxySpider>> spiderCache;
 
 	public ProxySpiderDispatcher() {
-		cacheThreadPool = Executors.newCachedThreadPool();
+		cacheThreadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 		proxyMap = new HashMap<Integer, AbstractProxySpider>();
-		init();
+		spiderCache = new LinkedList<>();
+		registerSpiders();
 	}
 
-	// 注册已有的代理爬虫以供选择
-	private void init() {
+	// 注册已有的代理爬虫实例对象
+	private void registerSpiders() {
 
 		Class<? extends ProxySpiderDispatcher> clazz = this.getClass();
 
@@ -108,53 +113,58 @@ public class ProxySpiderDispatcher implements Runnable {
 	 */
 	@Override
 	public void run() {
-
 		ProxyPool proxyPool = ProxyPool.getInstance();
-
+		// 启动代理爬虫的策略
 		while (proxyPool.size() < 20) {
-			startProxySpider(proxyPool);
+			// 最多同时启动【两种】代理爬虫，具体个数根据不同代理网站自己的爬取策略而定
+			if (spiderCache.size() < 3) {
+				Class<? extends AbstractProxySpider> clazz = launchSpider();
+				spiderCache.add(clazz);
+			}
+			// 代理爬虫已经启动至少一个，给它时间完成任务
 			try {
-				Thread.sleep(10000);
+				TimeUnit.SECONDS.sleep(15);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		proxyPool.signalEnough();
+		spiderCache.clear();
 	}
 
-	// 启动代理爬虫
-	private void startProxySpider(ProxyPool proxyPool) {
-		// 随机选择代理爬虫
-
-		Proxy p = proxyPool.peek();
+	/**
+	
+	 * @Title: launchSpider
+	
+	 * @Description: 启动代理爬虫
+	
+	 * @return
+	
+	 * @return: Class<? extends AbstractProxySpider>
+	
+	 */
+	private Class<? extends AbstractProxySpider> launchSpider() {
+		// 随机选择代理爬虫，尽量不去爬一个代理ip的源站
+		Proxy p = ProxyPool.getInstance().peek();
 		AbstractProxySpider proxySpider = proxyMap.get(selectSpider(p));
 		log.info("Proxy spider selected: " + proxySpider + " And coming proxy is " + p);
-
-		if (proxySpider instanceof KuaiProxySpider) {
-			log.info("kuai dai li ");
-			Class<? extends AbstractProxySpider> clazz = proxySpider.getClass();
-			AbstractProxySpider newSpider = null;
-			for (int i = 0; i < 3; i++) {
+		List<AbstractProxySpider> list = proxySpider.listExeInstances();
+		if (list.size() > 5) {
+			for (AbstractProxySpider aps : list) {
+				cacheThreadPool.execute(aps);
 				try {
-					newSpider = clazz.newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				cacheThreadPool.execute(newSpider);
-
-				try {
-					Thread.sleep(rand.nextInt(5000));
+					TimeUnit.SECONDS.sleep(rand.nextInt(10));
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			return;
+		} else {
+			for (AbstractProxySpider aps : list) {
+				cacheThreadPool.execute(aps);
+			}
 		}
-
-		cacheThreadPool.execute(proxySpider);
+		return proxySpider.getClass();
 	}
 
 	/**

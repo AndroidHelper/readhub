@@ -23,8 +23,10 @@ import org.springframework.stereotype.Service;
 
 import cn.john.hub.dao.NewsMapper;
 import cn.john.hub.domain.NewsDO;
+import cn.john.hub.domain.NewsSpiderRecord;
 import cn.john.hub.domain.NewsVO;
 import cn.john.hub.service.NewsService;
+import cn.john.hub.spider.AbstractNewsSpider;
 
 /**
  * 
@@ -60,11 +62,27 @@ public class NewsServiceImpl implements NewsService {
 	 * 
 	 */
 	@Override
-	public int saveNews(List<NewsDO> newsList) {
-		int before = nMapper.getNewsCount();
-		nMapper.saveNews(newsList);
-		int after = nMapper.getNewsCount();
-		return after - before;
+	public boolean saveNews(List<NewsDO> newsList, AbstractNewsSpider ans) {
+		int total = newsList.size();
+		int count = 0;
+		for (NewsDO n : newsList) {
+			if (nMapper.checkUrlIfExists(n.getUrl()) != null) {
+				count++;
+			}
+		}
+		NewsSpiderRecord nsr = new NewsSpiderRecord();
+		nsr.setTotal(total);
+		nsr.setNewsSpiderId(ans.getSpiderId());
+		nsr.setRepe_Rate((count * 1.0) / total);
+		nsr.setNewItemCount(total - count);
+		nMapper.saveNewsSpiderRecord(nsr);
+		try {
+			nMapper.saveNews(newsList);
+			return true;
+		} catch (Exception e) {
+			log.error("Error saving news!", e.getMessage());
+		}
+		return false;
 	}
 
 	/*
@@ -82,6 +100,24 @@ public class NewsServiceImpl implements NewsService {
 	@Override
 	public List<NewsVO> listNews() {
 		return nMapper.listNews();
+	}
+
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: listNewsStatis
+	 * 
+	 * @Description: TODO
+	 * 
+	 * @return
+	 * 
+	 * @see cn.john.hub.service.NewsService#listNewsStatis()
+	 * 
+	 */
+	@Override
+	public List<NewsSpiderRecord> listNewsStatis() {
+		// TODO Auto-generated method stub
+		return nMapper.listNewsStatis();
 	}
 
 }

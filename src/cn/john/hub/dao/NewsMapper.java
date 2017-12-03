@@ -17,6 +17,7 @@ package cn.john.hub.dao;
 import java.util.List;
 
 import cn.john.hub.domain.NewsDO;
+import cn.john.hub.domain.NewsSpiderRecord;
 import cn.john.hub.domain.NewsVO;
 
 /**
@@ -38,4 +39,10 @@ public interface NewsMapper {
 	List<NewsVO> listNews();
 
 	int getNewsCount();
+
+	String checkUrlIfExists(String url);
+
+	void saveNewsSpiderRecord(NewsSpiderRecord nsr);
+	
+	List<NewsSpiderRecord> listNewsStatis();
 }

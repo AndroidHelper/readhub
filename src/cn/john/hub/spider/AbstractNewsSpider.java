@@ -53,25 +53,26 @@ public abstract class AbstractNewsSpider extends AbstractSpider<NewsDO> {
 		return HttpClientFactory.createUsingProxy(site, headers, true);
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: consume
-	
+	 * 
 	 * @Description: 定义新闻
-	
+	 * 
 	 * @param list
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractSpider#consume(java.util.List)
-	
+	 * 
 	 */
 	@Override
 	protected void consume(List<NewsDO> list) {
-		BeanUtil.getNewsServiceBean().saveNews(list);
+		BeanUtil.getNewsServiceBean().saveNews(list, this);
 	}
 
 	// 用于调度
-	protected abstract int getDelayFactor();
+	public abstract int getDelayFactor();
 
-	protected abstract int getSerialNumber();
+	public abstract int getSpiderId();
 
 }

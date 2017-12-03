@@ -58,7 +58,7 @@ public class XiCiProxySpider extends AbstractProxySpider {
 	 * 
 	 */
 	@Override
-	protected List<Proxy> parseHtml(String html) throws ParseException{
+	protected List<Proxy> parseHtml(String html) throws ParseException {
 		log.info("Start parsing xici html...");
 		try {
 			Document doc = Jsoup.parse(html);
@@ -99,7 +99,7 @@ public class XiCiProxySpider extends AbstractProxySpider {
 			log.info("parse xici proxy html completed!");
 			return proxyList;
 		} catch (Exception e) {
-			throw new ParseException("Parse xici proxy html failed!",e);
+			throw new ParseException("Parse xici proxy html failed!", e);
 		}
 
 	}
@@ -109,32 +109,34 @@ public class XiCiProxySpider extends AbstractProxySpider {
 		return "0----XiCiProxySpider";
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: site
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractSpider#site()
-	
+	 * 
 	 */
 	@Override
 	public String site() {
 		return HubConsts.PROXY_XICI;
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: getPossiblity
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractProxySpider#getPossiblity()
-	
+	 * 
 	 */
 	@Override
 	public int getPossiblity() {
@@ -142,21 +144,42 @@ public class XiCiProxySpider extends AbstractProxySpider {
 		return 15;
 	}
 
-	/* (non Javadoc)
-	
+	/*
+	 * (non Javadoc)
+	 * 
 	 * @Title: getProxySpiderId
-	
+	 * 
 	 * @Description: TODO
-	
+	 * 
 	 * @return
-	
+	 * 
 	 * @see cn.john.hub.spider.AbstractProxySpider#getProxySpiderId()
-	
+	 * 
 	 */
 	@Override
 	public int getProxySpiderId() {
 		// TODO Auto-generated method stub
 		return proxySpiderId;
+	}
+
+	/*
+	 * (non Javadoc)
+	 * 
+	 * @Title: listExeInstances
+	 * 
+	 * @Description: TODO
+	 * 
+	 * @return
+	 * 
+	 * @see cn.john.hub.spider.AbstractProxySpider#listExeInstances()
+	 * 
+	 */
+	@Override
+	protected List<AbstractProxySpider> listExeInstances() {
+		// TODO Auto-generated method stub
+		List<AbstractProxySpider> list = new ArrayList<>();
+		list.add(this);
+		return list;
 	}
 
 }
