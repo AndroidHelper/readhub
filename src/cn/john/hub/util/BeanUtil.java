@@ -51,6 +51,7 @@ public class BeanUtil {
 	public static NewsService getNewsServiceBean() {
 		return (NewsService) appContext.getBean("newsServiceImpl");
 	}
+	
 	public static ProxyService getProxyServiceBean() {
 		return (ProxyService) appContext.getBean("proxyServiceImpl");
 	}

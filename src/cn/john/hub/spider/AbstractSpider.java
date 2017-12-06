@@ -45,7 +45,7 @@ import cn.john.hub.util.HttpClientFactory;
 public abstract class AbstractSpider<T> implements Runnable {
 
 	protected static final Logger log = LogManager.getLogger("spider");
-	
+
 	private HttpClient httpClient;
 
 	protected AbstractSpider() {
@@ -148,10 +148,10 @@ public abstract class AbstractSpider<T> implements Runnable {
 	@Override
 	public void run() {
 		try {
-			consume(parseHtml(getHtml(site())));
+			List<T> list = parseHtml(getHtml(site()));
+			consume(list);
 		} catch (ParseException e) {
-			String name = this.getClass().getName().replace(".class", "");
-			log.info(name + "---" + e.getMessage());
+			log.info(this + "---" + e.getMessage());
 			HttpClientFactory.discardProxy(httpClient.getProxy());
 		}
 	}
