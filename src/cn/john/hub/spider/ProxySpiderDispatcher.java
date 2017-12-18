@@ -69,7 +69,7 @@ public class ProxySpiderDispatcher implements Runnable {
 
 	// 注册已有的代理爬虫实例对象
 	private void registerSpiders() {
-
+		
 		Class<? extends ProxySpiderDispatcher> clazz = this.getClass();
 
 		ClassLoader loader = clazz.getClassLoader();

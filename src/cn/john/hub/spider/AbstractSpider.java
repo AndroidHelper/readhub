@@ -151,7 +151,7 @@ public abstract class AbstractSpider<T> implements Runnable {
 			List<T> list = parseHtml(getHtml(site()));
 			consume(list);
 		} catch (ParseException e) {
-			log.info(this + "---" + e.getMessage());
+			log.error(this + "---" + e.getMessage());
 			HttpClientFactory.discardProxy(httpClient.getProxy());
 		}
 	}
